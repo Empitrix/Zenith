@@ -1,3 +1,0 @@
-G:/STM32/CWorkspace/CMake_contains/build/CMakeFiles/CMake_contains.dir
-G:/STM32/CWorkspace/CMake_contains/build/CMakeFiles/ALL_BUILD.dir
-G:/STM32/CWorkspace/CMake_contains/build/CMakeFiles/ZERO_CHECK.dir

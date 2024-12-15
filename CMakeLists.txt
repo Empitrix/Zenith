@@ -54,11 +54,12 @@ set (PROJECT_SOURCES
 	)
 
 
+	# set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
+	# set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
 
 
 set (PROJECT_DEFINES
-	# LIST COMPILER DEFINITIONS HERE
-    )
+		)
 
 set (PROJECT_INCLUDES
 	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Inc"
@@ -66,12 +67,20 @@ set (PROJECT_INCLUDES
 	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Boards"
 	"${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc"
-	# LIST INCLUDE DIRECTORIES HERE
-
 	)
 
+	# default
 	add_definitions(-DSTM32F103x8)
 
+	if(DEFINED Board)
+		# string(TOLOWER ${Board} BOARD_TARGET)
+		set(BOARD_TARGET ${Board})
+	endif()
+
+
+
+	message(WARNING ">> BOARD: ${BOARD_TARGET}")
+	# target_compile_definitions(${PROJECT_NAME} PRIVATE BOARD_TARGET)
 
 
 file(GLOB PROJECT_SOURCES
@@ -96,6 +105,9 @@ project(${PROJECT_NAME})
 enable_language(ASM)
 
 
+
+
+
 # set(HAL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Src")
 # file(GLOB HAL_SOURCES "${HAL_SRC_DIR}/*.c")
 # target_sources(${PROJECT_NAME} PRIVATE ${HAL_SOURCES})
@@ -109,8 +121,13 @@ elseif (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_STATIC_LIBRARY})
   add_library(${PROJECT_NAME} ${PROJECT_SOURCES})
 endif()
 
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE "-D${BOARD_TARGET}")
 add_compile_definitions (${PROJECT_DEFINES})
 include_directories (${PROJECT_INCLUDES})
+
+# target_compile_definitions(${PROJECT_NAME} PRIVATE Board="${BOARD_TARGET}")
+
 # target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDES})
 
 set (CMAKE_EXECUTABLE_SUFFIX ".elf")

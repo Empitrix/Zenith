@@ -4,13 +4,7 @@
 CMakeFiles/CMake_contains.dir/Core/Src/main.c.obj: G:/STM32/CWorkspace/CMake_contains/Core/Src/main.c \
   G:/STM32/CWorkspace/CMake_contains/Core/Inc/main.h \
   G:/STM32/CWorkspace/CMake_contains/Core/Inc/stm32f1xx_hal_conf.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_compiler.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_gcc.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_version.h \
-  G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/core_cm3.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h \
@@ -25,14 +19,7 @@ CMakeFiles/CMake_contains.dir/Core/Src/main.c.obj: G:/STM32/CWorkspace/CMake_con
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
   G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/_newlib_version.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/_default_types.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/stdint.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_intsup.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_stdint.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/features.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stddef.h \
-  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stdint.h
+  H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stddef.h
 
 CMakeFiles/CMake_contains.dir/Core/Src/stm32f1xx_hal_msp.c.obj: G:/STM32/CWorkspace/CMake_contains/Core/Src/stm32f1xx_hal_msp.c \
   G:/STM32/CWorkspace/CMake_contains/Core/Inc/main.h \
@@ -539,43 +526,21 @@ CMakeFiles/CMake_contains.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc
   H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stdint.h
 
 
-G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h:
+G:/STM32/CWorkspace/CMake_contains/Core/Src/main.c:
 
 G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 
-G:/STM32/CWorkspace/CMake_contains/Core/Src/main.c:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_gcc.h:
+G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h:
 
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/sched.h:
 
 G:/STM32/CWorkspace/CMake_contains/Core/Inc/main.h:
-
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/endian.h:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h:
 
 G:/STM32/CWorkspace/CMake_contains/Core/Inc/stm32f1xx_hal_conf.h:
 
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/assert.h:
 
 G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h:
-
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_intsup.h:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_compiler.h:
-
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/_types.h:
-
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/ieeefp.h:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_version.h:
-
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/cdefs.h:
-
-G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/core_cm3.h:
 
 G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 
@@ -617,6 +582,34 @@ G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ha
 
 G:/STM32/CWorkspace/CMake_contains/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h:
 
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stddef.h:
+
+G:/STM32/CWorkspace/CMake_contains/Core/Inc/stm32f1xx_it.h:
+
+G:/STM32/CWorkspace/CMake_contains/Core/Src/stm32f1xx_hal_msp.c:
+
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/endian.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h:
+
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_intsup.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_compiler.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_gcc.h:
+
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/_types.h:
+
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/machine/ieeefp.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/cmsis_version.h:
+
+H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/cdefs.h:
+
+G:/STM32/CWorkspace/CMake_contains/Drivers/CMSIS/Include/core_cm3.h:
+
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_timeval.h:
 
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/_newlib_version.h:
@@ -627,13 +620,7 @@ H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.external
 
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/sys/_stdint.h:
 
-H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stddef.h:
-
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/lib/gcc/arm-none-eabi/12.3.1/include/stdint.h:
-
-G:/STM32/CWorkspace/CMake_contains/Core/Inc/stm32f1xx_it.h:
-
-G:/STM32/CWorkspace/CMake_contains/Core/Src/stm32f1xx_hal_msp.c:
 
 H:/ST/STM32CubeIDE_1.17.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.1.0.202410251130/tools/arm-none-eabi/include/stdio.h:
 
