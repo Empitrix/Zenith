@@ -1,0 +1,3 @@
+G:/STM32/CWorkspace/CMake_contains/Debug/CMakeFiles/CMake_contains.dir
+G:/STM32/CWorkspace/CMake_contains/Debug/CMakeFiles/edit_cache.dir
+G:/STM32/CWorkspace/CMake_contains/Debug/CMakeFiles/rebuild_cache.dir
