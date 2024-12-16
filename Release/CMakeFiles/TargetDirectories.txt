@@ -1,3 +1,0 @@
-G:/STM32/CWorkspace/CMake_contains/Release/CMakeFiles/CMake_contains.dir
-G:/STM32/CWorkspace/CMake_contains/Release/CMakeFiles/edit_cache.dir
-G:/STM32/CWorkspace/CMake_contains/Release/CMakeFiles/rebuild_cache.dir

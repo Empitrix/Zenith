@@ -44,57 +44,68 @@ set (RUNTIME_LIBRARY          "--specs=nano.specs")
 set (RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 
 
-set (PROJECT_SOURCES
-	# LIST SOURCE FILES HERE
+
+# Default board target
+set(BOARD_TARGET "STM32F103x8")
+# set(BOARD_DIRECTORY "STM32F1xx")
+
+
+# Supported boards are separated by ";"
+set(SUPPORTED_BOARDS "STM32F103x8")
+
+# Update target board if defined
+if(DEFINED Board)
+	set(BOARD_TARGET ${Board})
+endif()
+
+
+# Extact directory for STM32<XX>xx
+string(FIND "${BOARD_TARGET}" "STM32" POSITION)
+if(POSITION EQUAL 0)
+	string(SUBSTRING "${BOARD_TARGET}" 0 7 FIRST_SEVEN_CHARS)
+	set(BOARD_DIRECTORY "${FIRST_SEVEN_CHARS}xx")
+endif()
+
+
+
+if(NOT BOARD_TARGET IN_LIST SUPPORTED_BOARDS)
+	message(FATAL_ERROR "Board \"${BOARD_TARGET}\" is not supported!")
+endif()
+
+
+
+file(GLOB SOURCES_S "${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Startup/*.s")
+
+# LIST SOURCE FILES HERE
+set(PROJECT_SOURCES
 	Startup/startup_stm32f103c8tx.s
 	Sources/main.c
 	Sources/syscalls.c
 	Sources/sysmem.c
-
-	)
-
-
-	# set(CMAKE_C_COMPILER "arm-none-eabi-gcc")
-	# set(CMAKE_CXX_COMPILER "arm-none-eabi-g++")
-
-
-set (PROJECT_DEFINES
-		)
-
-set (PROJECT_INCLUDES
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Inc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32F1xx/Include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Boards"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc"
-	)
-
-	# default
-	add_definitions(-DSTM32F103x8)
-
-	if(DEFINED Board)
-		# string(TOLOWER ${Board} BOARD_TARGET)
-		set(BOARD_TARGET ${Board})
-	endif()
-
-
-
-	message(WARNING ">> BOARD: ${BOARD_TARGET}")
-	# target_compile_definitions(${PROJECT_NAME} PRIVATE BOARD_TARGET)
-
-
-file(GLOB PROJECT_SOURCES
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Src/*.c"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Core/Src/*.c"
+	${SOURCES_S}
 )
 
 
+set(PROJECT_DEFINES
+)
+
+set(PROJECT_INCLUDES
+	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${BOARD_DIRECTORY}_HAL_Driver/Inc"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/${BOARD_DIRECTORY}/Include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Boards"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Inc"
+)
 
 
+message(WARNING "Target Board: ${BOARD_TARGET}")
 
-	# message(WARNING "PATH: ${CMAKE_CURRENT_SOURCE_DIR}/Driver/STM32F1xx_HAL_Driver/Inc")
+file(GLOB PROJECT_SOURCES
+	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${BOARD_DIRECTORY}_HAL_Driver/Src/*.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Src/*.c"
+)
 
-	# message(WARNING "${CMAKE_CURRENT_SOURCE_DIR}/Driver/CMSIS/Device/ST/STM32F1xx/Include")
+
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################
 
@@ -105,15 +116,6 @@ project(${PROJECT_NAME})
 enable_language(ASM)
 
 
-
-
-
-# set(HAL_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F1xx_HAL_Driver/Src")
-# file(GLOB HAL_SOURCES "${HAL_SRC_DIR}/*.c")
-# target_sources(${PROJECT_NAME} PRIVATE ${HAL_SOURCES})
-
-
-
 if (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_EXECUTABLE})
   add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
   add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>)
@@ -122,13 +124,11 @@ elseif (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_STATIC_LIBRARY})
 endif()
 
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE "-D${BOARD_TARGET}")
+# Add target board macro
+add_definitions(-D${BOARD_TARGET})
+
 add_compile_definitions (${PROJECT_DEFINES})
 include_directories (${PROJECT_INCLUDES})
-
-# target_compile_definitions(${PROJECT_NAME} PRIVATE Board="${BOARD_TARGET}")
-
-# target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDES})
 
 set (CMAKE_EXECUTABLE_SUFFIX ".elf")
 set (CMAKE_STATIC_LIBRARY_SUFFIX ".a")
