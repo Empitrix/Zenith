@@ -76,6 +76,31 @@ endif()
 
 file(GLOB SOURCES_S "${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Startup/*.s")
 
+
+# Save git sha
+execute_process(
+  COMMAND git rev-parse HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  RESULT_VARIABLE git_result
+  OUTPUT_VARIABLE git_sha
+  ERROR_VARIABLE git_error
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if(NOT git_result EQUAL 0)
+	message(FATAL_ERROR "Faild to get build number version: ${git_error}")
+endif()
+
+set(GIT_SHA ${git_sha})
+add_definitions(-DGIT_SHA="${git_sha}")
+message(STATUS "Git SHA: ${GIT_SHA}")
+
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/whereYouPutMyModules/")
+# include(GetGitRevisionDescription)
+# get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+
+
+
 # LIST SOURCE FILES HERE
 set(PROJECT_SOURCES
 	Startup/startup_stm32f103c8tx.s
