@@ -95,10 +95,16 @@ set(GIT_SHA ${git_sha})
 add_definitions(-DGIT_SHA="${git_sha}")
 message(STATUS "Git SHA: ${GIT_SHA}")
 
-# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/whereYouPutMyModules/")
-# include(GetGitRevisionDescription)
-# get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 
+# Update Template
+configure_file(
+  ${CMAKE_SOURCE_DIR}/template.json.in
+  ${CMAKE_BINARY_DIR}/config.json
+  @ONLY
+)
+
+# Optionally, print the path of the generated JSON file
+message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/config.json")
 
 
 # LIST SOURCE FILES HERE

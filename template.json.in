@@ -1,0 +1,7 @@
+{
+	"name": "@PROJECT_NAME@",
+  "build_number":"@GIT_SHA@",
+	"board_target": "@BOARD_TARGET@",
+	"board_directory": "@BOARD_DIRECTORY@",
+	"startup_sources": "@SOURCES_S@"
+}
