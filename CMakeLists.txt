@@ -45,12 +45,18 @@ set(RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 
 set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# Supported boards are separated by ";"
-set(SUPPORTED_MCUS "STM32F103x8")
-set(SUPPORTED_BOARDS "BLUE-PILL")
+unset(SUPPORTED_BOARDS)
 unset(SUPPORTED_APPLICATIONS)
+unset(SUPPORTED_MCUS)
+
 unset(SELECTED_APP_SOURCES)
 unset(SELECTED_APP_TARGET)
+
+unset(BOARD)
+unset(MCU)
+
+unset(BASE_DIR)
+unset(TARGET_DEF)
 
 
 
@@ -63,16 +69,7 @@ if(DEFINED MCU)
 	set(MCU_TARGET ${MCU})
 endif()
 
-
-
-# Extact directory for STM32<XX>xx
-string(FIND "${MCU_TARGET}" "STM32" POSITION)
-if(POSITION EQUAL 0)
-	string(SUBSTRING "${MCU_TARGET}" 0 7 FIRST_SEVEN_CHARS)
-	set(MCU_DIRECTORY "${FIRST_SEVEN_CHARS}xx")
-endif()
-
-
+# Make sure only one target is specified
 if(NOT DEFINED MCU_TARGET AND NOT DEFINED BOARD_TARGET)
   message(FATAL_ERROR "You must specify exactly one target")
 elseif(DEFINED MCU_TARGET AND DEFINED BOARD_TARGET)
@@ -80,39 +77,14 @@ elseif(DEFINED MCU_TARGET AND DEFINED BOARD_TARGET)
 endif()
 
 
-
-if(DEFINED BOARD_TARGET)
-	message(STATUS "Target Board: ${BOARD_TARGET}")
-	# Target is a board
-	if(NOT BOARD_TARGET IN_LIST SUPPORTED_BOARDS)
-		message(FATAL_ERROR "Board \"${BOARD_TARGET}\" is not supported!")
-	endif()
-	set(BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/boards/${BOARD_TARGET}")
-	set(TARGET_DIR "${BOARD_TARGET}")
-	string(REPLACE "-" "_" TARGET_DEF "${TARGET_DIR}")
-
-elseif(DEFINED MCU_TARGET)
-	message(STATUS "Target MCU: ${MCU_TARGET}")
-	# Target is a MCU
-	if(NOT MCU_TARGET IN_LIST SUPPORTED_MCUS)
-		message(FATAL_ERROR "MCU \"${MCU_TARGET}\" is not supported!")
-	endif()
-	set(BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/mcu/${MCU_DIRECTORY}")
-	set(TARGET_DIR "${MCU_DIRECTORY}")
-	set(TARGET_DEF "${MCU_TARGET}")
-
-endif()
-
-
+# Add sub directory '/src'
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 
 
-file(GLOB SOURCES_S
-	"${BASE_DIR}/Core/Startup/*.s")
-
-
+file(GLOB SOURCES_S "${BASE_DIR}/Core/Startup/*.s")
 message(STATUS "Base Directory: ${BASE_DIR}")
+
 
 ###################### Build Number ######################
 execute_process(
@@ -190,11 +162,7 @@ endif()
 
 
 # Add target board macro
-if(TARGET_DIR STREQUAL "BLUE-PILL")
-	add_definitions("-DSTM32F103x8")
-else()
-	add_definitions("-D${TARGET_DEF}")
-endif()
+add_definitions("-D${TARGET_DEF}")
 
 add_compile_definitions (${PROJECT_DEFINES})
 include_directories (${PROJECT_INCLUDES})

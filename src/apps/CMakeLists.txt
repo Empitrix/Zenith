@@ -1,6 +1,6 @@
 # Apps
 
-# Add application's path to add supported applications
+# Add the APPLICATION directory here if you wish to support it
 list(APPEND SUPPORTED_APPLICATIONS
 	"${CMAKE_CURRENT_SOURCE_DIR}/blink"
 	"${CMAKE_CURRENT_SOURCE_DIR}/hello-world"
