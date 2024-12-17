@@ -48,7 +48,11 @@ set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Supported boards are separated by ";"
 set(SUPPORTED_MCUS "STM32F103x8")
 set(SUPPORTED_BOARDS "BLUE-PILL")
-set(SUPPORTED_APPLICATIONS "blink;hello-world;test;main")
+unset(SUPPORTED_APPLICATIONS)
+unset(SELECTED_APP_SOURCES)
+unset(SELECTED_APP_TARGET)
+
+
 
 # Update target board if defined
 if(DEFINED BOARD)
@@ -100,29 +104,12 @@ elseif(DEFINED MCU_TARGET)
 endif()
 
 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-if(NOT DEFINED APP)
-	message(FATAL_ERROR "Application is not defined")
-	string(TOLOWER "${APP}" APP_TARGET)
-	if(NOT APP_TARGET IN_LIST SUPPORTED_APPLICATIONS)
-		message(FATAL_ERROR "App \"${MCU_TARGET}\" is not found!")
-	endif()
-else()
-set(APP_TARGET "blink")
-endif()
 
 
 file(GLOB SOURCES_S
 	"${BASE_DIR}/Core/Startup/*.s")
-
-file(GLOB SELECTED_APP_SOURCES
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP_TARGET}/*.c"
-)
-
-
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP}")
-	message(FATAL_ERROR "Invalid application path: \"${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP}\"")
-endif()
 
 
 message(STATUS "Base Directory: ${BASE_DIR}")
@@ -161,14 +148,12 @@ message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/config.json")
 
 
 # LIST SOURCE FILES HERE
-set(PROJECT_SOURCES
+set(ROJECT_SOURCES
 	Startup/startup_stm32f103c8tx.s
-	# Sources/main.c
-	# Sources/syscalls.c
-	# Sources/sysmem.c
 	${SOURCES_S}
-	${SELECTED_APP_SOURCES}
+	${SELECTED_APP_SOURCES}  # Set in /src
 )
+
 
 
 set(PROJECT_DEFINES
