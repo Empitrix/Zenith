@@ -57,33 +57,25 @@ unset(MCU)
 
 unset(BASE_DIR)
 unset(TARGET_DEF)
+unset(MCU_BASE_DIR)
 
 
 
 # Update target board if defined
-if(DEFINED BOARD)
-	set(BOARD_TARGET ${BOARD})
+if(NOT DEFINED BOARD)
+	message(FATAL_ERROR "You have to specify a target")
 endif()
-
-if(DEFINED MCU)
-	set(MCU_TARGET ${MCU})
-endif()
-
-# Make sure only one target is specified
-if(NOT DEFINED MCU_TARGET AND NOT DEFINED BOARD_TARGET)
-  message(FATAL_ERROR "You must specify exactly one target")
-elseif(DEFINED MCU_TARGET AND DEFINED BOARD_TARGET)
-  message(FATAL_ERROR "You can't have both targets set")
-endif()
-
 
 # Add sub directory '/src'
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 
+file(GLOB BOARD_INCLUDES "${BASE_DIR}/*.h")
+file(GLOB BOARD_SOURCES "${BASE_DIR}/*.c")
 
-file(GLOB SOURCES_S "${BASE_DIR}/Core/Startup/*.s")
-message(STATUS "Base Directory: ${BASE_DIR}")
+
+file(GLOB SOURCES_S "${MCU_BASE_DIR}/Core/Startup/*.s")
+message(STATUS "MCU Directory: ${MCU_BASE_DIR}")
 
 
 ###################### Build Number ######################
@@ -119,30 +111,43 @@ message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/config.json")
 ###################### Project Files ######################
 
 
+
+file(GLOB HAL_SOURCES "${MCU_BASE_DIR}/HAL/Src/*.c")
+file(GLOB CORE_SOURCES "${MCU_BASE_DIR}/Core/Src/*.c")
+file(GLOB SYSTEM_SOURCES "${MCU_BASE_DIR}/System/*.c")
+
+
 # LIST SOURCE FILES HERE
-set(ROJECT_SOURCES
-	Startup/startup_stm32f103c8tx.s
+set(PROJECT_SOURCES
 	${SOURCES_S}
-	${SELECTED_APP_SOURCES}  # Set in /src
+	${BOARD_SOURCES}  # Board Sources
+	${HAL_SOURCES}
+	${CORE_SOURCES}
+
+	# ${SELECTED_APP_SOURCES}  # Set in /src
+	# ${SYSTEM_SOURCES}
 )
 
+# file(GLOB PROJECT_SOURCES
+# 	"${MCU_BASE_DIR}/HAL/Src/*.c"
+# 	"${MCU_BASE_DIR}/Core/Src/*.c"
+# )
 
 
 set(PROJECT_DEFINES
 )
 
 set(PROJECT_INCLUDES
-	"${BASE_DIR}/HAL/Inc"
-	"${BASE_DIR}/Core/Inc"
-	"${BASE_DIR}/CMSIS/Headers"
-	"${BASE_DIR}/CMSIS/Include"
+	"${MCU_BASE_DIR}/HAL/Inc"
+	"${MCU_BASE_DIR}/Core/Inc"
+	"${MCU_BASE_DIR}/CMSIS/Headers"
+	"${MCU_BASE_DIR}/CMSIS/Include"
+	${BOARD_INCLUDES}  # Board Includes
 )
 
 
-file(GLOB PROJECT_SOURCES
-	"${BASE_DIR}/HAL/Src/*.c"
-	"${BASE_DIR}/Core/Src/*.c"
-)
+
+# message(FATAL_ERROR "${MCU_BASE_DIR}/System/*.c")
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################
 
