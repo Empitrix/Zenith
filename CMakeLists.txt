@@ -13,71 +13,121 @@
 cmake_minimum_required(VERSION 3.20)
 
 ###################### CONSTANTS ######################################
-set (PROJECT_TYPE_EXECUTABLE          "exe")
-set (PROJECT_TYPE_STATIC_LIBRARY      "static-lib")
-set (MCPU_CORTEX_M0				      "-mcpu=cortex-m0")
-set (MCPU_CORTEX_M0PLUS				  "-mcpu=cortex-m0plus")
-set (MCPU_CORTEX_M3				      "-mcpu=cortex-m3")
-set (MCPU_CORTEX_M4				      "-mcpu=cortex-m4")
-set (MCPU_CORTEX_M7				      "-mcpu=cortex-m7")
-set (MCPU_CORTEX_M33				  "-mcpu=cortex-m33")
-set (MCPU_CORTEX_M55				  "-mcpu=cortex-m55")
-set (MCPU_CORTEX_M85				  "-mcpu=cortex-m85")
-set (MFPU_FPV4_SP_D16                 "-mfpu=fpv4-sp-d16")
-set (MFPU_FPV5_D16                    "-mfpu=fpv5-d16")
-set (RUNTIME_LIBRARY_REDUCED_C        "--specs=nano.specs")
-set (RUNTIME_LIBRARY_STD_C            "")
-set (RUNTIME_LIBRARY_SYSCALLS_MINIMAL "--specs=nosys.specs")
-set (RUNTIME_LIBRARY_SYSCALLS_NONE    "")
-set (MFLOAT_ABI_SOFTWARE              "-mfloat-abi=soft")
-set (MFLOAT_ABI_HARDWARE              "-mfloat-abi=hard")
-set (MFLOAT_ABI_MIX                   "-mfloat-abi=softfp")
+set(PROJECT_TYPE_EXECUTABLE          "exe")
+set(PROJECT_TYPE_STATIC_LIBRARY      "static-lib")
+set(MCPU_CORTEX_M0                   "-mcpu=cortex-m0")
+set(MCPU_CORTEX_M0PLUS               "-mcpu=cortex-m0plus")
+set(MCPU_CORTEX_M3                   "-mcpu=cortex-m3")
+set(MCPU_CORTEX_M4                   "-mcpu=cortex-m4")
+set(MCPU_CORTEX_M7                   "-mcpu=cortex-m7")
+set(MCPU_CORTEX_M33                  "-mcpu=cortex-m33")
+set(MCPU_CORTEX_M55                  "-mcpu=cortex-m55")
+set(MCPU_CORTEX_M85                  "-mcpu=cortex-m85")
+set(MFPU_FPV4_SP_D16                 "-mfpu=fpv4-sp-d16")
+set(MFPU_FPV5_D16                    "-mfpu=fpv5-d16")
+set(RUNTIME_LIBRARY_REDUCED_C        "--specs=nano.specs")
+set(RUNTIME_LIBRARY_STD_C            "")
+set(RUNTIME_LIBRARY_SYSCALLS_MINIMAL "--specs=nosys.specs")
+set(RUNTIME_LIBRARY_SYSCALLS_NONE    "")
+set(MFLOAT_ABI_SOFTWARE              "-mfloat-abi=soft")
+set(MFLOAT_ABI_HARDWARE              "-mfloat-abi=hard")
+set(MFLOAT_ABI_MIX                   "-mfloat-abi=softfp")
 #######################################################################
 
 ###################### VARIABLES ######################################
-set (PROJECT_NAME             "CMake_contains")
-set (PROJECT_TYPE             "exe")
-set (LINKER_SCRIPT            "../STM32F103C8TX_FLASH.ld")
-set (MCPU                     "-mcpu=Cortex-M3")
-set (MFLOAT_ABI               "")
-set (RUNTIME_LIBRARY          "--specs=nano.specs")
-set (RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
+set(PROJECT_NAME             "CMake_contains")
+set(PROJECT_TYPE             "exe")
+set(LINKER_SCRIPT            "../STM32F103C8TX_FLASH.ld")
+set(MCPU                     "-mcpu=Cortex-M3")
+set(MFLOAT_ABI               "")
+set(RUNTIME_LIBRARY          "--specs=nano.specs")
+set(RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
 
-
-
-# Default board target
-set(BOARD_TARGET "STM32F103x8")
-# set(BOARD_DIRECTORY "STM32F1xx")
-
+set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Supported boards are separated by ";"
-set(SUPPORTED_BOARDS "STM32F103x8")
+set(SUPPORTED_MCUS "STM32F103x8")
+set(SUPPORTED_BOARDS "BLUE-PILL")
+set(SUPPORTED_APPLICATIONS "blink;hello-world;test;main")
 
 # Update target board if defined
-if(DEFINED Board)
-	set(BOARD_TARGET ${Board})
+if(DEFINED BOARD)
+	set(BOARD_TARGET ${BOARD})
 endif()
+
+if(DEFINED MCU)
+	set(MCU_TARGET ${MCU})
+endif()
+
 
 
 # Extact directory for STM32<XX>xx
-string(FIND "${BOARD_TARGET}" "STM32" POSITION)
+string(FIND "${MCU_TARGET}" "STM32" POSITION)
 if(POSITION EQUAL 0)
-	string(SUBSTRING "${BOARD_TARGET}" 0 7 FIRST_SEVEN_CHARS)
-	set(BOARD_DIRECTORY "${FIRST_SEVEN_CHARS}xx")
+	string(SUBSTRING "${MCU_TARGET}" 0 7 FIRST_SEVEN_CHARS)
+	set(MCU_DIRECTORY "${FIRST_SEVEN_CHARS}xx")
+endif()
+
+
+if(NOT DEFINED MCU_TARGET AND NOT DEFINED BOARD_TARGET)
+  message(FATAL_ERROR "You must specify exactly one target")
+elseif(DEFINED MCU_TARGET AND DEFINED BOARD_TARGET)
+  message(FATAL_ERROR "You can't have both targets set")
 endif()
 
 
 
-if(NOT BOARD_TARGET IN_LIST SUPPORTED_BOARDS)
-	message(FATAL_ERROR "Board \"${BOARD_TARGET}\" is not supported!")
+if(DEFINED BOARD_TARGET)
+	message(STATUS "Target Board: ${BOARD_TARGET}")
+	# Target is a board
+	if(NOT BOARD_TARGET IN_LIST SUPPORTED_BOARDS)
+		message(FATAL_ERROR "Board \"${BOARD_TARGET}\" is not supported!")
+	endif()
+	set(BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/boards/${BOARD_TARGET}")
+	set(TARGET_DIR "${BOARD_TARGET}")
+	string(REPLACE "-" "_" TARGET_DEF "${TARGET_DIR}")
+
+elseif(DEFINED MCU_TARGET)
+	message(STATUS "Target MCU: ${MCU_TARGET}")
+	# Target is a MCU
+	if(NOT MCU_TARGET IN_LIST SUPPORTED_MCUS)
+		message(FATAL_ERROR "MCU \"${MCU_TARGET}\" is not supported!")
+	endif()
+	set(BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/mcu/${MCU_DIRECTORY}")
+	set(TARGET_DIR "${MCU_DIRECTORY}")
+	set(TARGET_DEF "${MCU_TARGET}")
+
 endif()
 
 
 
-file(GLOB SOURCES_S "${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Startup/*.s")
+if(NOT DEFINED APP)
+	message(FATAL_ERROR "Application is not defined")
+	string(TOLOWER "${APP}" APP_TARGET)
+	if(NOT APP_TARGET IN_LIST SUPPORTED_APPLICATIONS)
+		message(FATAL_ERROR "App \"${MCU_TARGET}\" is not found!")
+	endif()
+else()
+set(APP_TARGET "blink")
+endif()
 
 
-# Save git sha
+file(GLOB SOURCES_S
+	"${BASE_DIR}/Core/Startup/*.s")
+
+file(GLOB SELECTED_APP_SOURCES
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP_TARGET}/*.c"
+)
+
+
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP}")
+	message(FATAL_ERROR "Invalid application path: \"${CMAKE_CURRENT_SOURCE_DIR}/src/apps/${APP}\"")
+endif()
+
+
+message(STATUS "Base Directory: ${BASE_DIR}")
+
+###################### Build Number ######################
 execute_process(
   COMMAND git rev-parse HEAD
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -96,9 +146,9 @@ add_definitions(-DGIT_SHA="${git_sha}")
 message(STATUS "Git SHA: ${GIT_SHA}")
 
 
-# Update Template
+###################### Build Info ######################
 configure_file(
-  ${CMAKE_SOURCE_DIR}/template.json.in
+	${CMAKE_DIR}/template.json.in
   ${CMAKE_BINARY_DIR}/config.json
   @ONLY
 )
@@ -107,13 +157,17 @@ configure_file(
 message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/config.json")
 
 
+###################### Project Files ######################
+
+
 # LIST SOURCE FILES HERE
 set(PROJECT_SOURCES
 	Startup/startup_stm32f103c8tx.s
-	Sources/main.c
-	Sources/syscalls.c
-	Sources/sysmem.c
+	# Sources/main.c
+	# Sources/syscalls.c
+	# Sources/sysmem.c
 	${SOURCES_S}
+	${SELECTED_APP_SOURCES}
 )
 
 
@@ -121,22 +175,17 @@ set(PROJECT_DEFINES
 )
 
 set(PROJECT_INCLUDES
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${BOARD_DIRECTORY}_HAL_Driver/Inc"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/${BOARD_DIRECTORY}/Include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Boards"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Inc"
+	"${BASE_DIR}/HAL/Inc"
+	"${BASE_DIR}/Core/Inc"
+	"${BASE_DIR}/CMSIS/Headers"
+	"${BASE_DIR}/CMSIS/Include"
 )
 
-
-message(WARNING "Target Board: ${BOARD_TARGET}")
 
 file(GLOB PROJECT_SOURCES
-	"${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${BOARD_DIRECTORY}_HAL_Driver/Src/*.c"
-	"${CMAKE_CURRENT_SOURCE_DIR}/Core/${BOARD_DIRECTORY}/Src/*.c"
+	"${BASE_DIR}/HAL/Src/*.c"
+	"${BASE_DIR}/Core/Src/*.c"
 )
-
-
 
 ############ MODIFY ACCORDING TO REQUIREMENTS) ########################
 
@@ -156,14 +205,18 @@ endif()
 
 
 # Add target board macro
-add_definitions(-D${BOARD_TARGET})
+if(TARGET_DIR STREQUAL "BLUE-PILL")
+	add_definitions("-DSTM32F103x8")
+else()
+	add_definitions("-D${TARGET_DEF}")
+endif()
 
 add_compile_definitions (${PROJECT_DEFINES})
 include_directories (${PROJECT_INCLUDES})
 
-set (CMAKE_EXECUTABLE_SUFFIX ".elf")
-set (CMAKE_STATIC_LIBRARY_SUFFIX ".a")
-set (CMAKE_C_FLAGS "${MCPU} -std=gnu11 ${MFPU} ${MFLOAT_ABI} ${RUNTIME_LIBRARY} -mthumb -Wall -Werror")
-set (CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${RUNTIME_LIBRARY_SYSCALLS} -Wl,-Map=test.map -Wl,--gc-sections -static -Wl,--start-group -lc -lm -Wl,--end-group")
-set (CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
+set(CMAKE_EXECUTABLE_SUFFIX ".elf")
+set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
+set(CMAKE_C_FLAGS "${MCPU} -std=gnu11 ${MFPU} ${MFLOAT_ABI} ${RUNTIME_LIBRARY} -mthumb -Wall -Werror")
+set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${RUNTIME_LIBRARY_SYSCALLS} -Wl,-Map=test.map -Wl,--gc-sections -static -Wl,--start-group -lc -lm -Wl,--end-group")
+set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
 

@@ -1,30 +1,30 @@
 ## BUILD
 
 
-For debug build:
+build:
 ```bash
-cmake -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Debug -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
-make -C Debug VERBOSE=1 -j
-```
-
-For release build:
-```bash
-cmake -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake -DAPP="blink" -DMCU="STM32F103x8" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 make -C Release VERBOSE=1 -j
 ```
+
+> [!NOTE]
+> You can only build the projct when only one target specified for MCU you can add `-DMCU=<name>` and for board you can add `-DBOARD=<name>`
+
+
+Default application is `blink` in located `/src/apps/blink`
 
 
 
 ## How to add a new board?
-### Update HAL
-Add `Inc` and `Src` folders to `<project>/Drivers/<BOARD>_HAL_Driver/*`
+add HALL (`Src` and `Inc`) in `src/boards/<board-name>/HALL`
+add HALL (`Src` and `Inc`) in `src/boards/<board-name>/Core`
+add HALL (`Src` and `Inc`) in `src/boards/<board-name>/CMSIS`
 
-### Update Core
-Add `Inc`, `Src`, `Startup` folders to `<project>/Core/<BOARD>_HAL_Driver/*`
-
-after that update `SUPPORTED_BOARDS` in the root `CMakeLists.txt` and add the board name (separate by `;`).
-
-### Update CMSIS
-Make sure that `CMSIS/Device` folder is updated. (`CMSIS/Device/ST/<BOARD>/Include`)
+## How to add a new MCU?
+add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/HALL`
+add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/Core`
+add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/CMSIS`
 
 
+> [!NOTE]
+> After adding each `board`, `MCU` or `app`, update the `SUPPORTED_BOARDS`, `SUPPORTED_MCUS` and `SUPPORTED_APPLICATIONS` located in `CMakeLists.txt`
