@@ -807,7 +807,7 @@ extern "C" {
 /** @defgroup GPIOEx_Private_Macros GPIOEx Private Macros
   * @{
   */
-#if defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F102xB) || defined(STM32F103x6) || defined(STM32F103x8)
+#if defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F102xB) || defined(STM32F103x6)
 #define GPIO_GET_INDEX(__GPIOx__) (((__GPIOx__) == (GPIOA))? 0uL :\
                                    ((__GPIOx__) == (GPIOB))? 1uL :\
                                    ((__GPIOx__) == (GPIOC))? 2uL :3uL)

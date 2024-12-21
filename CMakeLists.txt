@@ -1,6 +1,5 @@
 #############################################################################################################################
 # file:  CMakeLists.txt
-# brief: Template "CMakeLists.txt" for building of executables and static libraries.
 #
 # usage: Edit "VARIABLES"-section to suit project requirements.
 #        For debug build:
@@ -12,36 +11,19 @@
 #############################################################################################################################
 cmake_minimum_required(VERSION 3.20)
 
-###################### CONSTANTS ######################################
-set(PROJECT_TYPE_EXECUTABLE          "exe")
-set(PROJECT_TYPE_STATIC_LIBRARY      "static-lib")
-set(MCPU_CORTEX_M0                   "-mcpu=cortex-m0")
-set(MCPU_CORTEX_M0PLUS               "-mcpu=cortex-m0plus")
-set(MCPU_CORTEX_M3                   "-mcpu=cortex-m3")
-set(MCPU_CORTEX_M4                   "-mcpu=cortex-m4")
-set(MCPU_CORTEX_M7                   "-mcpu=cortex-m7")
-set(MCPU_CORTEX_M33                  "-mcpu=cortex-m33")
-set(MCPU_CORTEX_M55                  "-mcpu=cortex-m55")
-set(MCPU_CORTEX_M85                  "-mcpu=cortex-m85")
-set(MFPU_FPV4_SP_D16                 "-mfpu=fpv4-sp-d16")
-set(MFPU_FPV5_D16                    "-mfpu=fpv5-d16")
-set(RUNTIME_LIBRARY_REDUCED_C        "--specs=nano.specs")
-set(RUNTIME_LIBRARY_STD_C            "")
-set(RUNTIME_LIBRARY_SYSCALLS_MINIMAL "--specs=nosys.specs")
-set(RUNTIME_LIBRARY_SYSCALLS_NONE    "")
-set(MFLOAT_ABI_SOFTWARE              "-mfloat-abi=soft")
-set(MFLOAT_ABI_HARDWARE              "-mfloat-abi=hard")
-set(MFLOAT_ABI_MIX                   "-mfloat-abi=softfp")
-#######################################################################
 
 ###################### VARIABLES ######################################
-set(PROJECT_NAME             "CMake_contains")
-set(PROJECT_TYPE             "exe")
-set(LINKER_SCRIPT            "../STM32F103C8TX_FLASH.ld")
-set(MCPU                     "-mcpu=Cortex-M3")
-set(MFLOAT_ABI               "")
-set(RUNTIME_LIBRARY          "--specs=nano.specs")
-set(RUNTIME_LIBRARY_SYSCALLS "--specs=nosys.specs")
+
+set(PROJECT_NAME    "CMake_contains")
+set(PROJECT_TYPE    "exe")
+set(LINKER_SCRIPT   "../STM32F103C8TX_FLASH.ld")
+set(OUTPUT_ELF      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.elf")
+set(MAP_FILE        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map")
+set(OUTPUT_BIN      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin")
+set(OUTPUT_JSN      "config.json")
+
+set(C_COMPILER "arm-none-eabi-gcc")
+set(C_OBJCOPY  "arm-none-eabi-objcopy")
 
 set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -60,7 +42,6 @@ unset(TARGET_DEF)
 unset(MCU_BASE_DIR)
 
 
-
 # Update target board if defined
 if(NOT DEFINED BOARD)
 	message(FATAL_ERROR "You have to specify a target")
@@ -69,10 +50,8 @@ endif()
 # Add sub directory '/src'
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-
 file(GLOB BOARD_INCLUDES "${BASE_DIR}/*.h")
-file(GLOB BOARD_SOURCES "${BASE_DIR}/*.c")
-
+file(GLOB BOARD_SOURCES  "${BASE_DIR}/*.c")
 
 file(GLOB SOURCES_S "${MCU_BASE_DIR}/Core/Startup/*.s")
 message(STATUS "MCU Directory: ${MCU_BASE_DIR}")
@@ -80,12 +59,12 @@ message(STATUS "MCU Directory: ${MCU_BASE_DIR}")
 
 ###################### Build Number ######################
 execute_process(
-  COMMAND git rev-parse HEAD
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  RESULT_VARIABLE git_result
-  OUTPUT_VARIABLE git_sha
-  ERROR_VARIABLE git_error
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+	COMMAND git rev-parse HEAD
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	RESULT_VARIABLE git_result
+	OUTPUT_VARIABLE git_sha
+	ERROR_VARIABLE git_error
+	OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 if(NOT git_result EQUAL 0)
@@ -100,81 +79,124 @@ message(STATUS "Git SHA: ${GIT_SHA}")
 ###################### Build Info ######################
 configure_file(
 	${CMAKE_DIR}/template.json.in
-  ${CMAKE_BINARY_DIR}/config.json
-  @ONLY
+	${CMAKE_BINARY_DIR}/${OUTPUT_JSN}
+	@ONLY
 )
 
 # Optionally, print the path of the generated JSON file
-message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/config.json")
+message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/${OUTPUT_JSN}")
 
 
 ###################### Project Files ######################
 
-
-
-file(GLOB HAL_SOURCES "${MCU_BASE_DIR}/HAL/Src/*.c")
-file(GLOB CORE_SOURCES "${MCU_BASE_DIR}/Core/Src/*.c")
+file(GLOB HAL_SOURCES    "${MCU_BASE_DIR}/HAL/Src/*.c")
+file(GLOB CORE_SOURCES   "${MCU_BASE_DIR}/Core/Src/*.c")
 file(GLOB SYSTEM_SOURCES "${MCU_BASE_DIR}/System/*.c")
 
 
-# LIST SOURCE FILES HERE
+# List source files here
 set(PROJECT_SOURCES
-	${SOURCES_S}
-	${BOARD_SOURCES}  # Board Sources
-	${HAL_SOURCES}
-	${CORE_SOURCES}
-
-	${SELECTED_APP_SOURCES}  # Set in /src
-	${SYSTEM_SOURCES}
+	${BOARD_SOURCES}           # Board Sources
+	${HAL_SOURCES}             # HAL sources
+	${CORE_SOURCES}            # Core sources
+	${SOURCES_S}               # Startup sources
+	${SYSTEM_SOURCES}          # System sources
+	${SELECTED_APP_SOURCES}    # selected application sources
 )
 
-# file(GLOB PROJECT_SOURCES
-# 	"${MCU_BASE_DIR}/HAL/Src/*.c"
-# 	"${MCU_BASE_DIR}/Core/Src/*.c"
-# )
 
-
-set(PROJECT_DEFINES
-)
-
+# List source files here
 set(PROJECT_INCLUDES
 	"${MCU_BASE_DIR}/HAL/Inc"
 	"${MCU_BASE_DIR}/Core/Inc"
 	"${MCU_BASE_DIR}/CMSIS/Headers"
 	"${MCU_BASE_DIR}/CMSIS/Include"
-	${BOARD_INCLUDES}  # Board Includes
+	"${BOARD_INCLUDES}"              # Board Includes
 )
 
+foreach(DIR ${PROJECT_INCLUDES})
+	list(APPEND INCLUDE_FLAGS "-I${DIR}")
+endforeach()
 
-
-# message(FATAL_ERROR "${MCU_BASE_DIR}/System/*.c")
-
-############ MODIFY ACCORDING TO REQUIREMENTS) ########################
-
-#######################################################################
 
 ################## PROJECT SETUP ######################################
 project(${PROJECT_NAME})
+enable_language(C)
 enable_language(ASM)
 
 
-if (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_EXECUTABLE})
-  add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-  add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>)
-elseif (${PROJECT_TYPE} MATCHES ${PROJECT_TYPE_STATIC_LIBRARY})
-  add_library(${PROJECT_NAME} ${PROJECT_SOURCES})
-endif()
+set(OBJECT_FLAGS
+	"-mcpu=cortex-m3"
+	"-std=gnu11"
+	"-DUSE_HAL_DRIVER"
+	"-D${TARGET_DEF}"
+	"-c"
+	"-Os"
+	"-ffunction-sections"
+	"-fdata-sections"
+	"-Wall"
+	# "-fstack-usage"
+	# "-fcyclomatic-complexity"
+	# "-MMD"
+	# "-MP"
+	"--specs=nano.specs"
+	"-mfloat-abi=soft"
+	"-mthumb"
+)
 
 
-# Add target board macro
-add_definitions("-D${TARGET_DEF}")
+set(LINKER_FLAGS
+	"-mcpu=cortex-m3"
+	"-T${LINKER_SCRIPT}"
+	"--specs=nosys.specs"
+	"-Wl,-Map=${MAP_FILE}"
+	"-Wl,--gc-sections"
+	"-static"
+	"--specs=nano.specs"
+	"-mfloat-abi=soft"
+	"-mthumb"
+	"-Wl,--start-group"
+	"-lc"
+	"-lm"
+	"-Wl,--end-group"
+)
 
-add_compile_definitions (${PROJECT_DEFINES})
-include_directories (${PROJECT_INCLUDES})
+unset(OBJECTS)
 
-set(CMAKE_EXECUTABLE_SUFFIX ".elf")
-set(CMAKE_STATIC_LIBRARY_SUFFIX ".a")
-set(CMAKE_C_FLAGS "${MCPU} -std=gnu11 ${MFPU} ${MFLOAT_ABI} ${RUNTIME_LIBRARY} -mthumb -Wall -Werror")
-set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} ${RUNTIME_LIBRARY_SYSCALLS} -Wl,-Map=test.map -Wl,--gc-sections -static -Wl,--start-group -lc -lm -Wl,--end-group")
-set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -x assembler-with-cpp")
+foreach(SRC ${PROJECT_SOURCES})
+	get_filename_component(OBJ_NAME ${SRC} NAME_WE)   # Get object name
+	set(OBJ ${CMAKE_BINARY_DIR}/${OBJ_NAME}.o)        # Change extention container to .o
 
+	# Compile each given source to an object
+	add_custom_command(
+		OUTPUT ${OBJ}
+		COMMAND ${C_COMPILER} ${OBJECT_FLAGS} ${SRC} ${INCLUDE_FLAGS} -o ${OBJ}
+		DEPENDS ${SRC}
+		COMMENT "Compiling ${SRC} to \"${OBJ_NAME}.o\""
+		# COMMENT "Compiling ${SRC} to ${OBJ}"
+	)
+
+	# Save the object path into 'OBJECTS'
+	list(APPEND OBJECTS ${OBJ})
+endforeach()
+
+
+# Link objects and create "elf" file
+add_custom_command(
+	OUTPUT ${OUTPUT_ELF}
+	COMMAND ${C_COMPILER} -o ${OUTPUT_ELF} ${OBJECTS} ${LINKER_FLAGS}
+	COMMENT "Linking ${OUTPUT_ELF} from object files"
+	DEPENDS ${OBJECTS}  # Make sure objects are compiled
+)
+
+# Convert "elf" file to "binary"
+add_custom_command(
+	OUTPUT ${OUTPUT_BIN}
+	COMMAND ${C_OBJCOPY} -Obinary ${OUTPUT_ELF} ${OUTPUT_BIN}
+	COMMENT "Converting \"${OUTPUT_ELF}\" to binary format"
+	DEPENDS ${OUTPUT_ELF}  # Make sure elf file is created
+)
+
+# Compile the program
+add_custom_target(generate_binary ALL DEPENDS ${OUTPUT_BIN})
+message(STATUS "Binary target: \"${OUTPUT_BIN}\"")

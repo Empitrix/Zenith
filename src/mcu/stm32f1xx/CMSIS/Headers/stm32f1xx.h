@@ -136,12 +136,6 @@
   #include "stm32f105xc.h"
 #elif defined(STM32F107xC)
   #include "stm32f107xc.h"
-
-/// BLUE PILL
-#elif defined(STM32F103x8)
-  #include "stm32f103xb.h"
-
-
 #else
  #error "Please select first the target STM32F1xx device used in your application (in stm32f1xx.h file)"
 #endif

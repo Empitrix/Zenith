@@ -42,7 +42,7 @@ get_filename_component(BOARD_NAME "${BOARD_TARGET}" NAME)
 
 # Add board definatinos here
 if(BOARD_NAME STREQUAL "BLUE-PILL")
-	set(BOARD_DEF "STM32F103x8")
+	set(BOARD_DEF "STM32F103xB")
 else()
 	message(FATAL_ERROR "Processor for \"${BOARD_NAME}\" is not defined")
 endif()

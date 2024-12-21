@@ -1,5 +1,5 @@
 {
 	"name": "@PROJECT_NAME@",
-  "build_number":"@GIT_SHA@",
-  "app":"@SELECTED_APP_TARGET@"
+	"build_number":"@GIT_SHA@",
+	"app":"@SELECTED_APP_TARGET@"
 }

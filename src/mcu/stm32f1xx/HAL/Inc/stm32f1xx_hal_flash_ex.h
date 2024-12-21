@@ -237,7 +237,7 @@ typedef struct
 /** @defgroup FLASHEx_Page_Size Page Size
   * @{
   */ 
-#if (defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F103x6) || defined(STM32F100xB) || defined(STM32F101xB) || defined(STM32F102xB) || defined(STM32F103xB) || defined(STM32F103x8))
+#if (defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F103x6) || defined(STM32F100xB) || defined(STM32F101xB) || defined(STM32F102xB) || defined(STM32F103xB))
 #define FLASH_PAGE_SIZE          0x400U
 #endif /* STM32F101x6 || STM32F102x6 || STM32F103x6 */
        /* STM32F100xB || STM32F101xB || STM32F102xB || STM32F103xB */
@@ -311,7 +311,7 @@ typedef struct
   * @{
   */
 /* STM32 Low and Medium density devices */
-#if  defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F103x6)  || defined(STM32F103x8) \
+#if  defined(STM32F101x6) || defined(STM32F102x6) || defined(STM32F103x6) \
   || defined(STM32F100xB) || defined(STM32F101xB) || defined(STM32F102xB) \
   || defined(STM32F103xB)
 #define OB_WRP_PAGES0TO3               0x00000001U /*!< Write protection of page 0 to 3 */
