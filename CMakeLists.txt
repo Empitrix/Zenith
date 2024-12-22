@@ -50,7 +50,6 @@ endif()
 # Add sub directory '/src'
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-file(GLOB BOARD_INCLUDES "${BASE_DIR}/*.h")
 file(GLOB BOARD_SOURCES  "${BASE_DIR}/*.c")
 
 file(GLOB SOURCES_S "${MCU_BASE_DIR}/Core/Startup/*.s")
@@ -111,7 +110,7 @@ set(PROJECT_INCLUDES
 	"${MCU_BASE_DIR}/Core/Inc"
 	"${MCU_BASE_DIR}/CMSIS/Headers"
 	"${MCU_BASE_DIR}/CMSIS/Include"
-	"${BOARD_INCLUDES}"              # Board Includes
+	"${BASE_DIR}"              # Board Includes
 )
 
 foreach(DIR ${PROJECT_INCLUDES})
