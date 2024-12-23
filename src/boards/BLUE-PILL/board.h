@@ -1,9 +1,9 @@
 #include <stdint.h>
 
+#include "main.h"
+
 #ifndef __BOARD_BLUE_PILL__
 #define __BOARD_BLUE_PILL__
-// #include "board.c"
-
 
 typedef enum {
 	GPIN_0  = 0x0001,
@@ -25,6 +25,18 @@ typedef enum {
 } GPIO_PINS;
 
 typedef enum {
+	GPIO_TYPE_A = GPIOA_BASE,
+	GPIO_TYPE_B = GPIOB_BASE,
+	GPIO_TYPE_C = GPIOC_BASE,
+} GPIO_TYPE;
+
+typedef enum {
+	GPIO_INPUT_MODE = GPIO_MODE_INPUT,
+	GPIO_OUTPUT_MODE = GPIO_MODE_OUTPUT_PP,
+} GPIO_MODES;
+
+
+typedef enum {
 	PIN_OFF = 0u,
 	PIN_ON  = 1u,
 } GPIO_STATE;
@@ -33,6 +45,7 @@ typedef enum {
 
 void BoardInit(void);
 void DelayMs(uint32_t milliseconds);
-void PinModeSet(GPIO_PINS pin, GPIO_STATE state);
+void PinMode_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state);
+void PinMode_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode);
 
 #endif

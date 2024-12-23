@@ -39,22 +39,12 @@ void SystemClock_Config(void){
 
 // MX_GPIO_Init: GPIO Initialization Function
 void MX_GPIO_Init(void){
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
 	// GPIO Ports Clock Enable
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	// Configure GPIO pin Output Level
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-
-	// Configure GPIO pin : PC13
-	GPIO_InitStruct.Pin = GPIO_PIN_13;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	__HAL_RCC_GPIOE_CLK_ENABLE();
 }
 
 
@@ -63,10 +53,6 @@ void Error_Handler(void){
 	__disable_irq();
 	while(1){}
 }
-
-
-
-
 
 
 /// ***************************** BOARD ***************************** ///
@@ -78,12 +64,30 @@ void BoardInit(void){
 	MX_GPIO_Init();
 }
 
+
 /* HAL_Delay */
 void DelayMs(uint32_t milliseconds){
 	HAL_Delay(milliseconds);
 }
 
-void PinModeSet(GPIO_PINS pin, GPIO_STATE state){
-	HAL_GPIO_WritePin(GPIOC, pin, (GPIO_PinState)state);
+void PinMode_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state){
+	HAL_GPIO_WritePin((GPIO_TypeDef *)type, pin, (GPIO_PinState)state);
+}
+
+
+void PinMode_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode){
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+  
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = mode;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init((GPIO_TypeDef *)type, &GPIO_InitStruct); 
+
+	// GPIO_InitStruct.Pin = GPIO_PIN_9;
+	// GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	// GPIO_InitStruct.Pull = GPIO_PULLUP;
+	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	// HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
 }
 
