@@ -1,6 +1,7 @@
 #include "board.h"
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal_gpio.h"
 
 
 void SystemClock_Config(void){
@@ -70,24 +71,33 @@ void DelayMs(uint32_t milliseconds){
 	HAL_Delay(milliseconds);
 }
 
-void PinMode_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state){
+
+void GPIO_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode){
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = mode;
+	GPIO_InitStruct.Pull = mode == GPIO_INPUT_MODE ? GPIO_PULLDOWN : GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init((GPIO_TypeDef *)type, &GPIO_InitStruct); 
+}
+
+
+void GPIO_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state){
 	HAL_GPIO_WritePin((GPIO_TypeDef *)type, pin, (GPIO_PinState)state);
 }
 
 
-void PinMode_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode){
-	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-  
-	GPIO_InitStruct.Pin = pin;
-	GPIO_InitStruct.Mode = mode;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init((GPIO_TypeDef *)type, &GPIO_InitStruct); 
+void GPIO_Toggle(GPIO_PINS pin, GPIO_TYPE type){
+	HAL_GPIO_TogglePin((GPIO_TypeDef *)type, pin);
+}
 
-	// GPIO_InitStruct.Pin = GPIO_PIN_9;
-	// GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	// GPIO_InitStruct.Pull = GPIO_PULLUP;
-	// GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	// HAL_GPIO_Init(GPIOA, &GPIO_InitStruct); 
+
+GPIO_STATE GPIO_Read(GPIO_PINS pin, GPIO_TYPE type){
+	return (GPIO_STATE)HAL_GPIO_ReadPin((GPIO_TypeDef *)type, pin);
+}
+
+
+GPIO_Lock_Status GPIO_Lock(GPIO_PINS pin, GPIO_TYPE type){
+	return (GPIO_Lock_Status)HAL_GPIO_LockPin((GPIO_TypeDef *)type, pin);
 }
 

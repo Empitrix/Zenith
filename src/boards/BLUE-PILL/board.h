@@ -43,9 +43,20 @@ typedef enum {
 
 
 
+typedef enum {
+	GLS_OK = HAL_OK,
+	GLS_ERROR = HAL_ERROR,
+	GLS_BUSY = HAL_BUSY,
+	GLS_TIMEOUT = HAL_TIMEOUT,
+} GPIO_Lock_Status;
+
+
 void BoardInit(void);
 void DelayMs(uint32_t milliseconds);
-void PinMode_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state);
-void PinMode_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode);
+void GPIO_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state);
+void GPIO_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode);
+void GPIO_Toggle(GPIO_PINS pin, GPIO_TYPE type);
+GPIO_STATE GPIO_Read(GPIO_PINS pin, GPIO_TYPE type);
+GPIO_Lock_Status GPIO_Lock(GPIO_PINS pin, GPIO_TYPE type);
 
 #endif
