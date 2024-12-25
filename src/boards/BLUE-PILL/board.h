@@ -53,10 +53,34 @@ typedef enum {
 
 void BoardInit(void);
 void DelayMs(uint32_t milliseconds);
-void GPIO_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state);
-void GPIO_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode);
-void GPIO_Toggle(GPIO_PINS pin, GPIO_TYPE type);
-GPIO_STATE GPIO_Read(GPIO_PINS pin, GPIO_TYPE type);
-GPIO_Lock_Status GPIO_Lock(GPIO_PINS pin, GPIO_TYPE type);
+
+// void GPIO_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state);
+// void GPIO_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode);
+// void GPIO_Toggle(GPIO_PINS pin, GPIO_TYPE type);
+// GPIO_STATE GPIO_Read(GPIO_PINS pin, GPIO_TYPE type);
+// GPIO_Lock_Status GPIO_Lock(GPIO_PINS pin, GPIO_TYPE type);
+
+typedef enum {
+	GPIN_PULL_DOWN = GPIO_PULLDOWN,
+	GPIN_PULL_UP = GPIO_PULLUP,
+	GPIN_NO_PULL = GPIO_NOPULL,
+} PullConfig;
+
+typedef struct {
+	GPIO_PINS pin;
+	GPIO_TYPE type;
+	GPIO_MODES mode;
+	PullConfig pull_config;
+} GPIN;
+
+GPIN *GPIN_init(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config);
+void GPIN_set(GPIN * const me, GPIO_STATE state);
+void GPIN_toggle(GPIN * const me);
+GPIO_STATE GPIN_read(GPIN * const me);
+GPIO_Lock_Status GPIN_lock(GPIN * const me);
+
+// Timer
+
+int Board_GetTick(void);
 
 #endif
