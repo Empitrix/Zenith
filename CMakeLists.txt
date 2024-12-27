@@ -27,6 +27,15 @@ set(C_OBJCOPY  "arm-none-eabi-objcopy")
 
 set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# Flash Commands
+set(FLASH_START_ADDRESS "0x8000000")
+set(FLASHER "st-flash")
+set(FLASHER_FLAGS
+	"--reset"
+	"write"
+)
+
+
 unset(SUPPORTED_BOARDS)
 unset(SUPPORTED_APPLICATIONS)
 unset(SUPPORTED_MCUS)
@@ -199,3 +208,14 @@ add_custom_command(
 # Compile the program
 add_custom_target(generate_binary ALL DEPENDS ${OUTPUT_BIN})
 message(STATUS "Binary target: \"${OUTPUT_BIN}\"")
+
+
+if(DEFINED Flash)
+endif()
+
+
+# Add target "flash" to Makefile
+add_custom_target(flash
+	COMMAND ${FLASHER} ${FLASHER_FLAGS} ${OUTPUT_BIN} ${FLASH_START_ADDRESS}
+	COMMENT "Flashing"
+)

@@ -1,17 +1,25 @@
 #include "board.h"
 
+#define DELAY_VALUE 1000
 
-#define FLASHER_DELAY 100
+
+void my_delay(int value){
+	int wait = boardGetTick();
+	wait = wait + value;
+	while(boardGetTick() < wait){
+		__asm__("nop");
+	}
+}
 
 int main(void){
-	BoardInit();
+	boardInit();
 
 	GPIN led;
-	GPIN_init(&led, GPIN_13, GPIO_TYPE_C, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	gpinInit(&led, GPIN_13, GPIO_TYPE_C, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
 	while (1){
-		GPIN_toggle(&led);
-		DelayMs(FLASHER_DELAY);
+		gpinToggle(&led);
+		my_delay(DELAY_VALUE);
 	}
 }
 

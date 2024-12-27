@@ -56,66 +56,17 @@ void Error_Handler(void){
 }
 
 
-// /// ***************************** BOARD ***************************** ///
-// 
-// /* BoardInit: Initializes HAL, System Clock, GPIO pins */
-// void BoardInit(void){
-// 	HAL_Init();
-// 	SystemClock_Config();
-// 	MX_GPIO_Init();
-// }
-// 
-// 
-// void GPIO_Init(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode){
-// 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-// 	GPIO_InitStruct.Pin = pin;
-// 	GPIO_InitStruct.Mode = mode;
-// 	GPIO_InitStruct.Pull = mode == GPIO_INPUT_MODE ? GPIO_PULLDOWN : GPIO_PULLUP;
-// 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-// 	HAL_GPIO_Init((GPIO_TypeDef *)type, &GPIO_InitStruct); 
-// }
-// 
-// 
-// void GPIO_Set(GPIO_PINS pin, GPIO_TYPE type, GPIO_STATE state){
-// 	HAL_GPIO_WritePin((GPIO_TypeDef *)type, pin, (GPIO_PinState)state);
-// }
-// 
-// 
-// void GPIO_Toggle(GPIO_PINS pin, GPIO_TYPE type){
-// 	HAL_GPIO_TogglePin((GPIO_TypeDef *)type, pin);
-// }
-// 
-// 
-// GPIO_STATE GPIO_Read(GPIO_PINS pin, GPIO_TYPE type){
-// 	return (GPIO_STATE)HAL_GPIO_ReadPin((GPIO_TypeDef *)type, pin);
-// }
-// 
-// 
-// GPIO_Lock_Status GPIO_Lock(GPIO_PINS pin, GPIO_TYPE type){
-// 	return (GPIO_Lock_Status)HAL_GPIO_LockPin((GPIO_TypeDef *)type, pin);
-// }
-// 
-// 
-// /// ***************************** TIMER ***************************** ///
-// 
-// /* HAL_Delay */
-// void DelayMs(uint32_t milliseconds){
-// 	HAL_Delay(milliseconds);
-// }
-
-
-
 /// ***************************** BOARD ***************************** ///
 
 /* BoardInit: Initializes HAL, System Clock, GPIO pins */
-void BoardInit(void){
+void boardInit(void){
 	HAL_Init();
 	SystemClock_Config();
 	MX_GPIO_Init();
 }
 
 
-GPIN *GPIN_init(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config){
+GPIN *gpinInit(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config){
 	// Update me*
 	me->pin = pin;
 	me->type = type;
@@ -134,22 +85,22 @@ GPIN *GPIN_init(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode,
 }
 
 
-void GPIN_set(GPIN * const me, GPIO_STATE state){
+void gpinSet(GPIN * const me, GPIO_STATE state){
 	HAL_GPIO_WritePin((GPIO_TypeDef *)me->type, me->pin, (GPIO_PinState)state);
 }
 
 
-void GPIN_toggle(GPIN * const me){
+void gpinToggle(GPIN * const me){
 	HAL_GPIO_TogglePin((GPIO_TypeDef *)me->type, me->pin);
 }
 
 
-GPIO_STATE GPIN_read(GPIN * const me){
+GPIO_STATE gpinRead(GPIN * const me){
 	return (GPIO_STATE)HAL_GPIO_ReadPin((GPIO_TypeDef *)me->type, me->pin);
 }
 
 
-GPIO_Lock_Status GPIN_lock(GPIN * const me){
+GPIO_Lock_Status gpinLock(GPIN * const me){
 	return (GPIO_Lock_Status)HAL_GPIO_LockPin((GPIO_TypeDef *)me->type, me->pin);
 }
 
@@ -157,10 +108,10 @@ GPIO_Lock_Status GPIN_lock(GPIN * const me){
 /// ***************************** TIMER ***************************** ///
 
 /* HAL_Delay */
-void DelayMs(uint32_t milliseconds){
+void delayMs(uint32_t milliseconds){
 	HAL_Delay(milliseconds);
 }
 
-int Board_GetTick(void){
+int boardGetTick(void){
 	return (uint32_t)HAL_GetTick();
 }
