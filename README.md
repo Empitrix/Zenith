@@ -1,88 +1,104 @@
-## BUILD
+# Zenith: Abstraction Layer for Bluepill HAL
+
+Zenith is an abstraction layer designed to simplify and streamline development on the Bluepill board by building on top of the Hardware Abstraction Layer (HAL). This project provides a cleaner, more user-friendly interface while maintaining the low-level flexibility needed for embedded development.
+
+By using Zenith, developers can focus on application-level logic without getting bogged down in repetitive and complex HAL configurations.
+
+## Purpose
+The purpose of Zenith is to:
+
+- Provide an intuitive, lightweight interface for interacting with Bluepill hardware.
+- Abstract the complexities of HAL while retaining performance and flexibility.
+- Standardize common hardware interactions, reducing redundancy in application code.
+
+## Features
+- Ease of Use: Simplified APIs for peripherals like GPIO, PWM, and timers.
+- Modular Design: Organized into reusable modules for different peripherals and features.
+- Extensibility: Add support for new peripherals or extend functionality with minimal effort.
+- Optimized Performance: Minimal overhead, preserving the efficiency of HAL.
 
 
-build:
+## Project Structure
+The project is organized as follows:
+```plaintext
+Zenith
+├── cmake
+│   └── template.json.in
+├── CMakeLists.txt
+├── config
+├── sensors
+├── shared
+├── src
+│   ├── apps                     # Test applications
+│   ├── boards                   # supported boards
+│   │   ├── BLUE-PILL
+│   └── mcu                      # Microcontroller Unit
+│       └── stm32f1xx
+│           ├── CMSIS
+│           │   ├── Headers
+│           │   └── Include
+│           ├── Core             # Core abstraction logic
+│           │   ├── Inc
+│           │   ├── Src
+│           │   └── Startup
+│           ├── HAL               # HAL
+│           │   ├── Inc
+│           │   │   └── Legacy
+│           │   └── Src
+│           └── system
+└── system
+```
+
+## Key Modules
+- **GPIO**: High-level functions for pin configuration and usage.
+- **Timers**: Abstractions for configuring and using hardware timers.
+
+
+## Getting Started
+### Prerequisites
+1. [Bluepill board (STM32F103C8T6)](https://stm32-base.org/boards/STM32F103C8T6-Blue-Pill.html).
+2. [ARM GCC toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads).
+3. [CMake](https://cmake.org/)
+
+# Installation
+Clone the repository:
 ```bash
-cmake -DAPP="blink" -DMCU="STM32F103x8" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-make -C Release VERBOSE=1 -j
+git clone https://github.com/empitrix/zenith
+cd ./zenith
 ```
 
-<!--
-> [!NOTE]
-> You can only build the projct when only one target specified for MCU you can add `-DMCU=<name>` and for board you can add `-DBOARD=<name>`
-
-
-Default application is `blink` in located `/src/apps/blink`
-
-
-
-## How to add a new board?
-add HALL (`Src` and `Inc`) in `src/boards/<board-name>/HALL`
-add HALL (`Src` and `Inc`) in `src/boards/<board-name>/Core`
-add HALL (`Src` and `Inc`) in `src/boards/<board-name>/CMSIS`
-
-## How to add a new MCU?
-add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/HALL`
-add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/Core`
-add HALL (`Src` and `Inc`) in `src/mcu/<board-name>/CMSIS`
-
-
-> [!NOTE]
-> After adding each `board`, `MCU` or `app`, update the `SUPPORTED_BOARDS`, `SUPPORTED_MCUS` and `SUPPORTED_APPLICATIONS` located in `CMakeLists.txt`
--->
-
-## Add a new board
-If you want to add a new board first create a folder in `src/boards/<board-name>` witch contains `HAL` , `CMSIS`, `Core` and after that update the `SUPPORTED_BOARDS` in the `CMakeLists.txt` file that exists in the `src/boards`
-
-```plaintext
- boards
-└──  BLUE-PILL
-    ├──  CMSIS
-    │   ├──  Headers
-    │   ├──  Include
-    │   └──  STM32F1xx
-    │       ├──  Include
-    │       └──  Source
-    │           └──  Templates
-    ├──  Core
-    │   ├──  Inc
-    │   ├── 󱧼 Src
-    │   └──  Startup
-    └──  HAL
-        ├──  Inc
-        │   └──  Legacy
-        └── 󱧼 Src
+Now, by using [CMake](https://cmake.org/) and the [ARM GCC toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads), you can compile this project to generate `.elf` and `.bin` files.
+```bash
+cmake -DAPP="blink" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+make -C Release
 ```
 
+In this example, we set the board target to `"BLUE-PILL"` and the application target to `"blink"`, which compiles the applications located in `/src/apps/blink`. By using `make`, we run the generated `Makefile` located in the Release directory to compile the `.bin` file for us.
 
-## Add a new MCU
-If you want to add a new mcu first create a folder in `src/mcu/<mcu-name>` witch contains `HAL` , `CMSIS`, `Core` and after that update the `SUPPORTED_MCUS` in the `CMakeLists.txt` file that exists in the `src/mcu`
 
-```plaintext
- mcu
-└──  stm32f1xx
-    ├──  CMSIS
-    │   ├──  Headers
-    │   ├──  Include
-    │   └──  STM32F1xx
-    │       ├──  Include
-    │       └──  Source
-    │           └──  Templates
-    ├──  Core
-    │   ├──  Inc
-    │   ├── 󱧼 Src
-    │   └──  Startup
-    └──  HAL
-        ├──  Inc
-        │   └──  Legacy
-        └── 󱧼 Src
+
+## Usage
+Here’s an example of using Zenith to toggle an LED:
+
+```c
+#include "board.h"
+#include "gpio.h"
+
+#define DELAY 1000
+
+int main(void) {
+	boardInit();  // Initialize board
+
+	// Set C13 as output GPIO
+	GPIN led;
+	gpinInit(&led, GPIN_13, GPIO_TYPE_C, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+
+	while (1) {
+		gpinToggle(&led);  // Toggle the LED
+		delayMs(DELAY);    // Wait for 1 second
+	}
+}
 ```
 
-> [!NOTE]
-> If MCU name starts with `STM32` only the first seven character will be extracted e.g. `STM32F1` and two `x` will be added.
-> input: `STM32F103x8`, directory: `STM32F1xx`
-
-
-## Add a new app
-If you want to add a new app, create a folder in `src/apps` with the name of the `app` and after that update the `SUPPORTED_APPLICATIONS` in `CMakeLists.txt` that located in the `src/apps`
+For more examples, check the `src/apps/` directory.
 
