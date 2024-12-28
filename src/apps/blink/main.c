@@ -1,4 +1,5 @@
 #include "board.h"
+#include "gpio.h"
 
 #define DELAY_VALUE 1000
 
