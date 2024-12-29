@@ -33,6 +33,9 @@ typedef enum {
 typedef enum {
 	GPIO_INPUT_MODE = GPIO_MODE_INPUT,
 	GPIO_OUTPUT_MODE = GPIO_MODE_OUTPUT_PP,
+	GPIO_EXTI_RISING = GPIO_MODE_IT_RISING,
+	GPIO_EXTI_FALLING = GPIO_MODE_IT_FALLING,
+	GPIO_EXTI_RISING_FALLING = GPIO_MODE_IT_RISING_FALLING,
 } GPIO_MODES;
 
 
@@ -65,7 +68,7 @@ typedef struct {
 	PullConfig pull_config;
 } GPIN;
 
-GPIN *gpinInit(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config);
+GPIN gpinInit(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config);
 void gpinSet(GPIN * const me, GPIO_STATE state);
 void gpinToggle(GPIN * const me);
 GPIO_STATE gpinRead(GPIN * const me);

@@ -1,12 +1,13 @@
 #include "gpio.h"
 
 
-GPIN *gpinInit(GPIN * const me, GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config){
+GPIN gpinInit(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config){
+	GPIN me;
 	// Update me*
-	me->pin = pin;
-	me->type = type;
-	me->mode = mode;
-	me->pull_config = pull_config;
+	me.pin = pin;
+	me.type = type;
+	me.mode = mode;
+	me.pull_config = pull_config;
 
 	// Initialize
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
@@ -38,3 +39,19 @@ GPIO_STATE gpinRead(GPIN * const me){
 GPIO_Lock_Status gpinLock(GPIN * const me){
 	return (GPIO_Lock_Status)HAL_GPIO_LockPin((GPIO_TypeDef *)me->type, me->pin);
 }
+
+
+
+void EXTI9_5_IRQHandler(void){
+	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_9);
+}
+
+
+/*
+
+GPIO EXTI interrupt init
+
+HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+*/

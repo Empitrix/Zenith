@@ -25,12 +25,10 @@ typedef struct {
 	callback_t callback;
 	timerNumber_t timerNumber;
 	time_t interval;
-	// timeHandle_t htim;
 	TIM_HandleTypeDef htim;
 } timer_t;
 
-timer_t timerInit(timerNumber_t timerNumber, time_t interval,
-	callback_t callback, int start);
+timer_t timerInit(timerNumber_t timerNumber, time_t interval, callback_t callback, int start);
 
 
 // void timerStart(timer_t *timer);
