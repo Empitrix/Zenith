@@ -74,4 +74,10 @@ void gpinToggle(GPIN * const me);
 GPIO_STATE gpinRead(GPIN * const me);
 GPIO_Lock_Status gpinLock(GPIN * const me);
 
+
+
+
+// gpinSetInterrupt(gpio_t *gpio, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t *irqHandler );
+// gpinRemoveInterrupt(gpio_t *gpio);
+
 #endif

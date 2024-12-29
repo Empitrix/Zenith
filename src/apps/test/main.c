@@ -30,8 +30,8 @@ int main(void){
 	boardInit();
 
 	led1 = gpinInit(GPIN_2, GPIO_TYPE_A, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led1 = gpinInit(GPIN_3, GPIO_TYPE_A, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led1 = gpinInit(GPIN_4, GPIO_TYPE_A, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led2 = gpinInit(GPIN_3, GPIO_TYPE_A, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led3 = gpinInit(GPIN_4, GPIO_TYPE_A, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 	c13 = gpinInit(GPIN_13, GPIO_TYPE_C, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
 	timr1 = timerInit(TIMER_2, 200, &callback1, 1);
