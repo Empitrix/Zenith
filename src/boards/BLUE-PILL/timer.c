@@ -7,7 +7,7 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
 
-static callback_t timer_callbacks[MAX_TIMER_NUMBER] = { 0 };
+static timer_callback_t timer_callbacks[MAX_TIMER_NUMBER] = { 0 };
 
 
 static int get_timer_idx(timerNumber_t tn){
@@ -20,7 +20,7 @@ static int get_timer_idx(timerNumber_t tn){
 	return 1;
 }
 
-void save_callback(timerNumber_t tn, callback_t clbk){
+void save_callback(timerNumber_t tn, timer_callback_t clbk){
 	int idx = get_timer_idx(tn);
 	timer_callbacks[idx] = clbk;
 }
@@ -106,7 +106,7 @@ TIM_HandleTypeDef MX_TIM4_Init(int period){
 	return htim4;
 }
 
-timer_t timerInit(timerNumber_t timerNumber, time_t interval, callback_t callback, int start){
+timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t callback, int start){
 	timer_t timer = { 0 };
 
 	timer.interval = (int)interval * 10;

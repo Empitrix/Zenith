@@ -5,23 +5,18 @@
 #ifndef __BOARD_GPIO__
 #define __BOARD_GPIO__
 
+
+#define MAX_IRQ_HANDLER 16
+
 typedef enum {
-	GPIN_0  = 0x0001,
-	GPIN_1  = 0x0002,
-	GPIN_2  = 0x0004,
-	GPIN_3  = 0x0008,
-	GPIN_4  = 0x0010,
-	GPIN_5  = 0x0020,
-	GPIN_6  = 0x0040,
-	GPIN_7  = 0x0080,
-	GPIN_8  = 0x0100,
-	GPIN_9  = 0x0200,
-	GPIN_10 = 0x0400,
-	GPIN_11 = 0x0800,
-	GPIN_12 = 0x1000,
-	GPIN_13 = 0x2000,
-	GPIN_14 = 0x4000,
-	GPIN_15 = 0x8000,
+	GPIN_A0,  GPIN_A1,  GPIN_A2,  GPIN_A3,  GPIN_A4,  GPIN_A5,  GPIN_A6, GPIN_A7,
+	GPIN_A8, GPIN_A9, GPIN_A10, GPIN_A11, GPIN_A12, GPIN_A13, GPIN_A14, GPIN_A15,
+
+	GPIN_B0,  GPIN_B1,  GPIN_B2,  GPIN_B3,  GPIN_B4,  GPIN_B5,  GPIN_B6, GPIN_B7,
+	GPIN_B8, GPIN_B9, GPIN_B10, GPIN_B11, GPIN_B12, GPIN_B13, GPIN_B14, GPIN_B15,
+
+	GPIN_C0,  GPIN_C1,  GPIN_C2,  GPIN_C3,  GPIN_C4,  GPIN_C5,  GPIN_C6, GPIN_C7,
+	GPIN_C8, GPIN_C9, GPIN_C10, GPIN_C11, GPIN_C12, GPIN_C13, GPIN_C14, GPIN_C15,
 } GPIO_PINS;
 
 typedef enum {
@@ -33,9 +28,6 @@ typedef enum {
 typedef enum {
 	GPIO_INPUT_MODE = GPIO_MODE_INPUT,
 	GPIO_OUTPUT_MODE = GPIO_MODE_OUTPUT_PP,
-	GPIO_EXTI_RISING = GPIO_MODE_IT_RISING,
-	GPIO_EXTI_FALLING = GPIO_MODE_IT_FALLING,
-	GPIO_EXTI_RISING_FALLING = GPIO_MODE_IT_RISING_FALLING,
 } GPIO_MODES;
 
 
@@ -62,22 +54,38 @@ typedef enum {
 
 
 typedef struct {
-	GPIO_PINS pin;
+	int number;
+	int pin;
 	GPIO_TYPE type;
 	GPIO_MODES mode;
 	PullConfig pull_config;
 } GPIN;
 
-GPIN gpinInit(GPIO_PINS pin, GPIO_TYPE type, GPIO_MODES mode, PullConfig pull_config);
+GPIN gpinInit(GPIO_PINS pin, GPIO_MODES mode, PullConfig pull_config);
 void gpinSet(GPIN * const me, GPIO_STATE state);
 void gpinToggle(GPIN * const me);
 GPIO_STATE gpinRead(GPIN * const me);
 GPIO_Lock_Status gpinLock(GPIN * const me);
 
+typedef enum {
+	IRQ_RISING = GPIO_MODE_IT_RISING,
+	IRQ_FALLING = GPIO_MODE_IT_FALLING,
+	IRQ_RISING_FALLING = GPIO_MODE_IT_RISING_FALLING,
+} irqModes_t;
 
 
+typedef enum {
+	IRQ_VERY_LOW_PRIORITY,
+	IRQ_LOW_PRIORITY,
+	IRQ_MEDIUM_PRIORITY,
+	IRQ_HIGH_PRIORITY,
+	IRQ_VERY_HIGH_PRIORITY,
+} irqPriorities_t;
 
-// gpinSetInterrupt(gpio_t *gpio, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t *irqHandler );
-// gpinRemoveInterrupt(gpio_t *gpio);
+
+typedef void (*callbackFunction_t)(void);
+
+void gpinSetInterrupt(GPIN *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler);
+void gpinRemoveInterrupt(GPIN *pin);
 
 #endif

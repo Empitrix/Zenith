@@ -18,17 +18,17 @@ typedef enum {
 typedef uint32_t time_t;
 
 typedef TIM_HandleTypeDef timeHandle_t;
-typedef void (*callback_t)(timeHandle_t);
+typedef void (*timer_callback_t)(timeHandle_t);
 
 
 typedef struct {
-	callback_t callback;
+	timer_callback_t callback;
 	timerNumber_t timerNumber;
 	time_t interval;
 	TIM_HandleTypeDef htim;
 } timer_t;
 
-timer_t timerInit(timerNumber_t timerNumber, time_t interval, callback_t callback, int start);
+timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t callback, int start);
 
 
 // void timerStart(timer_t *timer);
