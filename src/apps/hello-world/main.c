@@ -16,6 +16,8 @@
  ******************************************************************************
  */
 
+#include "main.h"
+#include "board.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -27,4 +29,5 @@
 int main(void)
 {
 	printf("Hello, World\n");
+	delayMs(1000);
 }

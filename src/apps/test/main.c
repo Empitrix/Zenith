@@ -4,11 +4,11 @@
 
 #define DELAY_VALUE 1000
 
-GPIN led1;
-GPIN led2;
-GPIN led3;
+gpio_t led1;
+gpio_t led2;
+gpio_t led3;
 
-GPIN c13;
+gpio_t c13;
 
 void callback1(timeHandle_t htim){
 	gpinToggle(&led1);
@@ -29,10 +29,10 @@ timer_t timr3;
 int main(void){
 	boardInit();
 
-	led1 = gpinInit(GPIN_A2, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led2 = gpinInit(GPIN_A3, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led3 = gpinInit(GPIN_A4, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	c13  = gpinInit(GPIN_C13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led1 = gpinInit(A_2, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led2 = gpinInit(A_3, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led3 = gpinInit(A_4, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	c13  = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
 	timr1 = timerInit(TIMER_2, 200, &callback1, 1);
 	timr2 = timerInit(TIMER_3, 400, &callback2, 1);

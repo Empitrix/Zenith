@@ -2,9 +2,9 @@
 #include "board.h"
 #include "gpio.h"
 
-GPIN led1;
-GPIN c13;
-GPIN btn;
+gpio_t led1;
+gpio_t c13;
+gpio_t btn;
 
 
 void callback(){
@@ -14,10 +14,10 @@ void callback(){
 int main(void){
 	boardInit();
 
-	led1 = gpinInit(GPIN_A2,  GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	c13 = gpinInit(GPIN_C13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	led1 = gpinInit(A_2,  GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	c13 = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
-	btn = gpinInit (GPIN_A9,  GPIO_INPUT_MODE, GPIN_PULL_DOWN);
+	btn = gpinInit (A_9,  GPIO_INPUT_MODE, GPIN_PULL_DOWN);
 	gpinSetInterrupt(&btn, IRQ_RISING, IRQ_VERY_HIGH_PRIORITY, &callback);
 
 	// BlUE-PILL c-13 blink

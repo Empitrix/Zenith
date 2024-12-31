@@ -2,57 +2,55 @@
 #include "stm32f103xb.h"
 
 int gpio_bases[] = { GPIOA_BASE, GPIOB_BASE, GPIOC_BASE };
-int irq_modes[3] = {GPIO_MODE_IT_RISING, GPIO_MODE_IT_FALLING, GPIO_MODE_IT_RISING_FALLING};
 
 callbackFunction_t __irq_handlers[MAX_IRQ_HANDLER] = { NULL };
 
 
-GPIN gpinInit(GPIO_PINS pin, GPIO_MODES mode, PullConfig pull_config){
-	GPIN me;
+gpio_t gpinInit(GPIO_PINS pin, GPIO_MODES mode, PullConfig pull_config){
+	gpio_t gpin;
 	
 	int type = gpio_bases[(pin / 16)];
 
-	me.number = (pin % 16);
-	// me.pin = pin;
-	me.pin = (1 << me.number);
-	me.type = (GPIO_TYPE)type;
-	me.mode = mode;
-	me.pull_config = pull_config;
+	gpin.number = (pin % 16);
+	gpin.pin = (1 << gpin.number);
+	gpin.type = (GPIO_TYPE)type;
+	gpin.mode = mode;
+	gpin.pull_config = pull_config;
 
 	// Initialize
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-	GPIO_InitStruct.Pin = me.pin;
-	GPIO_InitStruct.Mode = me.mode;
-	GPIO_InitStruct.Pull = me.pull_config;
+	GPIO_InitStruct.Pin = gpin.pin;
+	GPIO_InitStruct.Mode = gpin.mode;
+	GPIO_InitStruct.Pull = gpin.pull_config;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init((GPIO_TypeDef *)me.type, &GPIO_InitStruct); 
+	HAL_GPIO_Init((GPIO_TypeDef *)gpin.type, &GPIO_InitStruct); 
 
-	return me;
+	return gpin;
 }
 
 
-void gpinSet(GPIN * const me, GPIO_STATE state){
-	HAL_GPIO_WritePin((GPIO_TypeDef *)me->type, me->pin, (GPIO_PinState)state);
+void gpinSet(gpio_t * const pin, GPIO_STATE state){
+	HAL_GPIO_WritePin((GPIO_TypeDef *)pin->type, pin->pin, (GPIO_PinState)state);
 }
 
 
-void gpinToggle(GPIN * const me){
-	HAL_GPIO_TogglePin((GPIO_TypeDef *)me->type, me->pin);
+void gpinToggle(gpio_t * const pin){
+	HAL_GPIO_TogglePin((GPIO_TypeDef *)pin->type, pin->pin);
 }
 
 
-GPIO_STATE gpinRead(GPIN * const me){
-	return (GPIO_STATE)HAL_GPIO_ReadPin((GPIO_TypeDef *)me->type, me->pin);
+GPIO_STATE gpinRead(gpio_t * const pin){
+	return (GPIO_STATE)HAL_GPIO_ReadPin((GPIO_TypeDef *)pin->type, pin->pin);
 }
 
 
-GPIO_Lock_Status gpinLock(GPIN * const me){
+GPIO_Lock_Status gpinLock(gpio_t * const me){
 	return (GPIO_Lock_Status)HAL_GPIO_LockPin((GPIO_TypeDef *)me->type, me->pin);
 }
 
 
 
-void gpinSetInterrupt(GPIN *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler){
+void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler){
 
 	int priority = 0;
 	switch (irqPriority){
@@ -105,7 +103,7 @@ void gpinSetInterrupt(GPIN *pin, irqModes_t irqMode, irqPriorities_t irqPriority
 }
 
 
-void gpinRemoveInterrupt(GPIN *pin){
+void gpinRemoveInterrupt(gpio_t *pin){
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 	GPIO_InitStruct.Pin = pin->pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;

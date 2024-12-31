@@ -6,7 +6,7 @@
 int main(void){
 	boardInit();
 
-	GPIN led = gpinInit(GPIN_C13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	gpio_t led = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
 	while (1){
 		gpinToggle(&led);

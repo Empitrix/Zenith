@@ -123,12 +123,33 @@ timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t c
 		case TIMER_4: timer.htim = MX_TIM4_Init(timer.interval); break;
 	}
 
+	timer.running = 0;
+
 	if(start){
 		HAL_TIM_Base_Start_IT(&timer.htim);
+		timer.running = 1;
 	}
 	
 	return timer;
 }
+
+
+/* timerStart: start timer if not running */
+void timerStart(timer_t *timer){
+	if(timer->running == 0){
+		HAL_TIM_Base_Start_IT(&timer->htim);
+		timer->running = 1;
+	}
+}
+
+/* timerStop: stop timer if running */
+void timerStop(timer_t *timer){
+	if(timer->running){
+		HAL_TIM_Base_Stop_IT(&timer->htim);
+		timer->running = 0;
+	}
+}
+
 
 
 timerNumber_t idx2timer(int idx){
@@ -149,3 +170,87 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		}
 	}
 }
+
+/* timerSetInterval: update interval */
+void timerSetInterval(timer_t *timer, time_t interval){
+	timer->interval = (int)interval * 10;
+
+	switch (timer->timerNumber) {
+		case TIMER_1: break;
+		case TIMER_2: timer->htim = MX_TIM2_Init(timer->interval); break;
+		case TIMER_3: timer->htim = MX_TIM3_Init(timer->interval); break;
+		case TIMER_4: timer->htim = MX_TIM4_Init(timer->interval); break;
+	}
+
+	HAL_TIM_Base_Start_IT(&timer->htim);
+}
+
+
+
+time_t timerGetInterval(const timer_t *timer){
+	return (time_t)timer->interval / 10;
+}
+
+
+bool timerIsRunning(const timer_t *timer){
+	return timer->running;
+}
+
+void timerSetCallback(timer_t *timer, timer_callback_t callback){
+	save_callback(timer->timerNumber, callback);
+}
+
+
+void timerReset(timer_t *timer, int restart){
+	((TIM_TypeDef *)timer->timerNumber)->CNT = 0;
+}
+
+
+void timerPause(timer_t *timer){
+	if(timer->running == 0){ return; }
+	switch (timer->timerNumber) {
+		case TIMER_1:
+			__HAL_RCC_TIM1_CLK_DISABLE();
+			break;
+		case TIMER_2:
+			__HAL_RCC_TIM2_CLK_DISABLE();
+			break;
+		case TIMER_3:
+			__HAL_RCC_TIM3_CLK_DISABLE();
+			break;
+		case TIMER_4:
+			__HAL_RCC_TIM4_CLK_DISABLE();
+			break;
+		default: break;
+	}
+	timer->running = 0;
+}
+
+void timerResume(timer_t *timer){
+	if(timer->running){ return; }
+	switch (timer->timerNumber) {
+		case TIMER_1:
+			__HAL_RCC_TIM1_CLK_ENABLE();
+			break;
+		case TIMER_2:
+			__HAL_RCC_TIM2_CLK_ENABLE();
+			break;
+		case TIMER_3:
+			__HAL_RCC_TIM3_CLK_ENABLE();
+			break;
+		case TIMER_4:
+			__HAL_RCC_TIM4_CLK_ENABLE();
+			break;
+		default: break;
+	}
+	timer->running = 1;
+}
+
+
+// time_t timerGetRemainingTime(const timer_t *timer){
+// 	int counter = __HAL_TIM_GetCounter(&timer->htim);
+// 	int interval = timer->interval / 10;
+// 	interval = interval - counter;
+// 	if(interval < 0){ interval = -interval; }
+// 	return interval;
+// }
