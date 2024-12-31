@@ -43,7 +43,7 @@ void timerReset(timer_t *timer, int restart);
 void timerPause(timer_t *timer);
 void timerResume(timer_t *timer);
 
-// time_t timerGetRemainingTime(const timer_t *timer);
+time_t timerGetRemainingTime(const timer_t *timer);
 
 
 #endif

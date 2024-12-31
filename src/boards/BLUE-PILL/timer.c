@@ -247,10 +247,9 @@ void timerResume(timer_t *timer){
 }
 
 
-// time_t timerGetRemainingTime(const timer_t *timer){
-// 	int counter = __HAL_TIM_GetCounter(&timer->htim);
-// 	int interval = timer->interval / 10;
-// 	interval = interval - counter;
-// 	if(interval < 0){ interval = -interval; }
-// 	return interval;
-// }
+time_t timerGetRemainingTime(const timer_t *timer){
+	// int interval = ((timer->interval) * (7200-1)) - __HAL_TIM_GetCounter(&timer->htim);
+	int interval = (timer->interval * ((int)HAL_GetTickFreq())) - __HAL_TIM_GetCounter(&timer->htim);
+	return interval;
+}
+
