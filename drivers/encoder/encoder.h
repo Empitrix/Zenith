@@ -16,13 +16,17 @@ typedef struct {
 	encoderCallback_t increment;
 	encoderCallback_t decrement;
 	gpio_t dt;
+	gpio_t clk;
 
-} Encoder_t;
+	int state;
+	int lastState;
+
+} encoder_t;
 
 
 
 /* encoderInit: Encoder Initialize */
-void encoderInit(Encoder_t *encoder, GPIO_PINS clk_pin,
+void encoderInit(encoder_t *encoder, GPIO_PINS clk_pin,
 	GPIO_PINS dt_pin, GPIO_PINS btn_pin,
 	callbackFunction_t btn_callback,
 	encoderCallback_t increment_cb,
@@ -31,8 +35,11 @@ void encoderInit(Encoder_t *encoder, GPIO_PINS clk_pin,
 
 
 
-uint32_t encoderGetCounter(Encoder_t *encoder);
-void encoderResetCounter(Encoder_t *encoder);
+uint32_t encoderGetCounter(encoder_t *encoder);
+void encoderResetCounter(encoder_t *encoder);
+
+
+void onRotaryUpdate(encoder_t *enc);
 
 #endif
 

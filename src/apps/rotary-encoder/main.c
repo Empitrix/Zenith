@@ -2,10 +2,8 @@
 #include "gpio.h"
 #include "encoder.h"
 
-gpio_t led;
-gpio_t led2;
-gpio_t led3;
-Encoder_t enc;
+gpio_t led, led2, led3;
+encoder_t enc;
 
 void onPressCallback(void *x){
 	gpinToggle(&led);
@@ -17,7 +15,6 @@ void onIncrement(int counter){
 
 void onDecrement(int counter){
 	gpinToggle(&led3);
-	// gpinToggle(&led2);
 }
 
 int main(){

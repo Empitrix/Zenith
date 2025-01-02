@@ -23,6 +23,9 @@ DIRS:list[str] = [
 	"src/mcu/stm32f1xx/CMSIS/Include",
 	"src/mcu/stm32f1xx/HAL/Inc",
 	"src/mcu/stm32f1xx/HAL/Inc/Legacy",
+
+	# Drivers
+	"drivers/encoder",
 ]
 
 def main() -> None:

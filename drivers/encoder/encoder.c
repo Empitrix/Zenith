@@ -1,23 +1,84 @@
 #include "encoder.h"
+#include <stdbool.h>
 
 
-void onRotaryChange(uint32_t *coutner, gpio_t *dt, encoderCallback_t increment, encoderCallback_t decrement){
-	if((int)gpinRead(dt) == 0){
-		*coutner = (*coutner) + 1;
-		increment(*coutner);
-	} else {
-		*coutner = (*coutner) - 1;
-		decrement(*coutner);
+void onRotaryChange(encoder_t *enc){
+	enc->state = (int)gpinRead(&enc->clk);
+	if(enc->state != enc->lastState){
+		if ((int)gpinRead(&enc->dt) != enc->state){ 
+			enc->counter++;
+			enc->increment(enc->counter);
+		 } else {
+			enc->counter--;
+			enc->decrement(enc->counter);
+		 }
 	}
+	enc->lastState = enc->state;
 }
+
+
+// void onRotaryChange(encoder_t *enc){
+// 	static uint8_t state = 0;
+// 	bool CLKstate = gpinRead(&enc->clk);
+// 	bool DTstate = gpinRead(&enc->dt);
+// 	switch (state) {
+// 		case 0:
+// 			if (!CLKstate){
+// 				state = 1;
+// 			} else if (!DTstate) {	 
+// 				state = 4;
+// 			}
+// 			break;
+// 		// Clockwise rotation
+// 		case 1:
+// 			if (!DTstate) {
+// 				state = 2;
+// 			} 
+// 			break;
+// 		case 2:
+// 			if (CLKstate) {
+// 				state = 3;
+// 			}
+// 			break;
+// 		case 3:
+// 			if (CLKstate && DTstate) { 
+// 				state = 0;
+// 				// ++inputDelta;
+// 				// printFlag = true;
+// 				enc->counter++;
+// 				enc->increment(enc->counter);
+// 			}
+// 			break;
+// 		// Anticlockwise rotation
+// 		case 4:
+// 			if (!CLKstate) {
+// 				state = 5;
+// 			}
+// 			break;
+// 		case 5:
+// 			if (DTstate) {
+// 				state = 6;
+// 			}
+// 			break;
+// 		case 6:
+// 			if (CLKstate && DTstate) {
+// 				state = 0;
+// 				// --inputDelta;
+// 				// printFlag = true;
+// 				enc->counter--;
+// 				enc->decrement(enc->counter);
+// 			}
+// 			break; 
+// 	}
+// }
 
 void onRotaryCallback(void *context){
-	Encoder_t *encdr = (Encoder_t *)context;
-	onRotaryChange(&encdr->counter, &encdr->dt, encdr->increment, encdr->decrement);
+	encoder_t *encdr = (encoder_t *)context;
+	onRotaryChange(encdr);
 }
 
 
-void encoderInit(Encoder_t *encoder, GPIO_PINS clk_pin,
+void encoderInit(encoder_t *encoder, GPIO_PINS clk_pin,
 	GPIO_PINS dt_pin, GPIO_PINS btn_pin,
 	callbackFunction_t btn_callback,
 	encoderCallback_t increment_cb,
@@ -37,6 +98,10 @@ void encoderInit(Encoder_t *encoder, GPIO_PINS clk_pin,
 	encoder->increment = increment_cb;
 	encoder->decrement = decrement_cb;
 	encoder->dt = dt;
+	encoder->clk = clk;
+
+	encoder->state = 0;
+	encoder->lastState = 0;
 
 	gpinSetInterrupt(&btn, IRQ_FALLING, IRQ_HIGH_PRIORITY, btn_callback, NULL);
 
@@ -46,11 +111,11 @@ void encoderInit(Encoder_t *encoder, GPIO_PINS clk_pin,
 }
 
 
-uint32_t encoderGetCounter(Encoder_t *encoder){
+uint32_t encoderGetCounter(encoder_t *encoder){
 	return encoder->counter;
 }
 
-void encoderResetCounter(Encoder_t *encoder){
+void encoderResetCounter(encoder_t *encoder){
 	encoder->counter = 0;
 }
 

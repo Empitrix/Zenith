@@ -15,11 +15,12 @@ cmake_minimum_required(VERSION 3.20)
 ###################### VARIABLES ######################################
 
 set(PROJECT_NAME    "CMake_contains")
-set(PROJECT_TYPE    "exe")
-set(LINKER_SCRIPT   "../STM32F103C8TX_FLASH.ld")
 set(OUTPUT_ELF      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.elf")
 set(MAP_FILE        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map")
 set(OUTPUT_BIN      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin")
+
+set(PROJECT_TYPE    "exe")
+set(LINKER_SCRIPT   "../STM32F103C8TX_FLASH.ld")
 set(OUTPUT_JSN      "config.json")
 
 set(C_COMPILER "arm-none-eabi-gcc")
@@ -130,6 +131,12 @@ endforeach()
 
 
 ################## PROJECT SETUP ######################################
+
+set(PROJECT_NAME    "${SELECTED_APP_TARGET}")
+set(OUTPUT_ELF      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.elf")
+set(MAP_FILE        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.map")
+set(OUTPUT_BIN      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin")
+
 project(${PROJECT_NAME})
 enable_language(C)
 enable_language(ASM)

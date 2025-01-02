@@ -6,9 +6,9 @@ list(APPEND SUPPORTED_APPLICATIONS
 	"${CMAKE_CURRENT_SOURCE_DIR}/hello-world"
 	"${CMAKE_CURRENT_SOURCE_DIR}/main"
 	"${CMAKE_CURRENT_SOURCE_DIR}/test"
-	"${CMAKE_CURRENT_SOURCE_DIR}/btn_interrupt"
+	"${CMAKE_CURRENT_SOURCE_DIR}/btn-interrupt"
 	"${CMAKE_CURRENT_SOURCE_DIR}/timer"
-	"${CMAKE_CURRENT_SOURCE_DIR}/rotary_encoder"
+	"${CMAKE_CURRENT_SOURCE_DIR}/rotary-encoder"
 )
 
 
