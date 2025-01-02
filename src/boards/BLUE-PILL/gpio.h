@@ -9,14 +9,6 @@
 #define MAX_IRQ_HANDLER 16
 
 typedef enum {
-	// GPIN_A0,  GPIN_A1,  GPIN_A2,  GPIN_A3,  GPIN_A4,  GPIN_A5,  GPIN_A6, GPIN_A7,
-	// GPIN_A8, GPIN_A9, GPIN_A10, GPIN_A11, GPIN_A12, GPIN_A13, GPIN_A14, GPIN_A15,
-
-	// GPIN_B0,  GPIN_B1,  GPIN_B2,  GPIN_B3,  GPIN_B4,  GPIN_B5,  GPIN_B6, GPIN_B7,
-	// GPIN_B8, GPIN_B9, GPIN_B10, GPIN_B11, GPIN_B12, GPIN_B13, GPIN_B14, GPIN_B15,
-
-	// GPIN_C0,  GPIN_C1,  GPIN_C2,  GPIN_C3,  GPIN_C4,  GPIN_C5,  GPIN_C6, GPIN_C7,
-	// GPIN_C8, GPIN_C9, GPIN_C10, GPIN_C11, GPIN_C12, GPIN_C13, GPIN_C14, GPIN_C15,
 	A_0,  A_1,  A_2,  A_3,  A_4,  A_5,  A_6, A_7,
 	A_8, A_9, A_10, A_11, A_12, A_13, A_14, A_15,
 
@@ -91,9 +83,17 @@ typedef enum {
 } irqPriorities_t;
 
 
-typedef void (*callbackFunction_t)(void);
+typedef void (*callbackFunction_t)(void*);
+// typedef void (*irqFunction_t)(void *);
 
-void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler);
+// void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler);
+void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler, void *context);
 void gpinRemoveInterrupt(gpio_t *pin);
+
+
+typedef struct {
+	callbackFunction_t handler;
+	void *context;
+} gpioContext_t;
 
 #endif

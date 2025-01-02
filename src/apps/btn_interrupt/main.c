@@ -7,7 +7,7 @@ gpio_t c13;
 gpio_t btn;
 
 
-void callback(){
+void callback(void *ctx){
 	gpinToggle(&led1);
 }
 
@@ -18,7 +18,7 @@ int main(void){
 	c13 = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
 
 	btn = gpinInit (A_9,  GPIO_INPUT_MODE, GPIN_PULL_DOWN);
-	gpinSetInterrupt(&btn, IRQ_RISING, IRQ_VERY_HIGH_PRIORITY, &callback);
+	gpinSetInterrupt(&btn, IRQ_RISING, IRQ_VERY_HIGH_PRIORITY, &callback, NULL);
 
 	// BlUE-PILL c-13 blink
 	while (1){

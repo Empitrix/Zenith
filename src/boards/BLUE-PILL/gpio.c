@@ -3,7 +3,7 @@
 
 int gpio_bases[] = { GPIOA_BASE, GPIOB_BASE, GPIOC_BASE };
 
-callbackFunction_t __irq_handlers[MAX_IRQ_HANDLER] = { NULL };
+gpioContext_t __irq_handlers[MAX_IRQ_HANDLER] = { NULL };
 
 
 gpio_t gpinInit(GPIO_PINS pin, GPIO_MODES mode, PullConfig pull_config){
@@ -50,7 +50,7 @@ GPIO_Lock_Status gpinLock(gpio_t * const me){
 
 
 
-void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler){
+void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler, void *context){
 
 	int priority = 0;
 	switch (irqPriority){
@@ -95,7 +95,8 @@ void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriori
 
 	// save callback
 	if(irqHandler != NULL){
-		__irq_handlers[pin->number] = irqHandler;
+		__irq_handlers[pin->number].handler = irqHandler;
+		__irq_handlers[pin->number].context = context;
 	}
 
 	HAL_NVIC_SetPriority(IRQnb, priority, 0);
@@ -110,7 +111,8 @@ void gpinRemoveInterrupt(gpio_t *pin){
 	HAL_GPIO_Init((GPIO_TypeDef *)pin->type, &GPIO_InitStruct); 
 
 	// Remove the handler
-	__irq_handlers[pin->number] = NULL;
+	__irq_handlers[pin->number].handler = NULL;
+	__irq_handlers[pin->number].context = NULL;
 }
 
 
@@ -118,8 +120,8 @@ void gpinRemoveInterrupt(gpio_t *pin){
 // External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	for(int i = 0; i < MAX_IRQ_HANDLER; i++){
-		if(GPIO_Pin == (1 << i) && __irq_handlers[i] != NULL){
-			__irq_handlers[i]();
+		if(GPIO_Pin == (1 << i) && __irq_handlers[i].handler != NULL){
+			__irq_handlers[i].handler(__irq_handlers[i].context);
 		}
 	}
 }

@@ -12,7 +12,7 @@ void onTimer1Callback(){
 }
 
 
-void onGpioCallback(){
+void onGpioCallback(void *ctx){
 	if(running){
 		timerPause(&tim1);
 	} else {
@@ -29,7 +29,7 @@ int main(void){
 
 	gpio_t c13 = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_PULL_DOWN);
 	gpio_t btn = gpinInit(A_9, GPIO_INPUT_MODE, GPIN_PULL_DOWN);
-	gpinSetInterrupt(&btn, IRQ_RISING, IRQ_VERY_HIGH_PRIORITY, &onGpioCallback);
+	gpinSetInterrupt(&btn, IRQ_RISING, IRQ_VERY_HIGH_PRIORITY, &onGpioCallback, NULL);
 
 	led = gpinInit(A_3, GPIO_OUTPUT_MODE, GPIN_PULL_DOWN);
 	led2 = gpinInit(A_4, GPIO_OUTPUT_MODE, GPIN_PULL_DOWN);

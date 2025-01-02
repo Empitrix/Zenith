@@ -110,6 +110,7 @@ set(PROJECT_SOURCES
 	${SOURCES_S}               # Startup sources
 	${SYSTEM_SOURCES}          # System sources
 	${SELECTED_APP_SOURCES}    # selected application sources
+	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder/encoder.c"
 )
 
 
@@ -120,6 +121,7 @@ set(PROJECT_INCLUDES
 	"${MCU_BASE_DIR}/CMSIS/Headers"
 	"${MCU_BASE_DIR}/CMSIS/Include"
 	"${BASE_DIR}"              # Board Includes
+	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder"
 )
 
 foreach(DIR ${PROJECT_INCLUDES})
