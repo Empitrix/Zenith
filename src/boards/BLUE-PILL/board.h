@@ -8,5 +8,6 @@
 void boardInit(void);
 void delayMs(uint32_t milliseconds);
 int boardGetTick(void);
+void serialPrint(const char * frmt, ...);
 
 #endif

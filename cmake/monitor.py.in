@@ -1,0 +1,30 @@
+from serial import Serial
+from time import sleep
+from datetime import datetime
+from rich.console import Console
+
+
+def prt(inpt:str):
+	cnsl = Console()
+	cnsl.print(inpt)
+
+
+def delay(milliseconds):
+	sleep(milliseconds / 1000.0)
+
+
+def main():
+	ser = Serial("@SERIAL_PORT@", int("@SERIAL_SPEED@"))
+	if ser.isOpen():
+		ser.close()
+	ser.open()
+
+	while True:
+		time:str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		prt(f"[blue]{ time }[/blue] { ser.readline().decode("UTF-8").rstrip() }")
+		delay(100)
+
+
+if __name__ == "__main__":
+	main()
+

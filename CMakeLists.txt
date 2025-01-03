@@ -22,16 +22,27 @@ set(OUTPUT_BIN      "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin")
 set(PROJECT_TYPE    "exe")
 set(LINKER_SCRIPT   "../STM32F103C8TX_FLASH.ld")
 set(OUTPUT_JSN      "config.json")
+set(OUTPUT_MONITOR  "monitor.py")
 
 set(C_COMPILER "arm-none-eabi-gcc")
 set(C_OBJCOPY  "arm-none-eabi-objcopy")
 
 set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+
+set(PY_INTERPRETER  "python")
+
+
 # Flash Commands
 set(FLASH_START_ADDRESS "0x8000000")
 set(FLASHER "st-flash")
-set(FLASHER_FLAGS
+set(FLASHER_HARD_FLAGS
+	"--reset"
+	"--connect-under-reset"
+	"write"
+)
+
+set(FLASHER_SOFT_FLAGS
 	"--reset"
 	"write"
 )
@@ -50,6 +61,10 @@ unset(MCU)
 unset(BASE_DIR)
 unset(TARGET_DEF)
 unset(MCU_BASE_DIR)
+
+# Default Serial Ports
+set(SERIAL_PORT "/dev/ttyUSB0")
+set(SERIAL_SPEED "115200")
 
 
 # Update target board if defined
@@ -94,6 +109,16 @@ configure_file(
 
 # Optionally, print the path of the generated JSON file
 message(STATUS "Generated config JSON at: ${CMAKE_BINARY_DIR}/${OUTPUT_JSN}")
+
+
+configure_file(
+	${CMAKE_DIR}/monitor.py.in
+	${CMAKE_BINARY_DIR}/${OUTPUT_MONITOR}
+	@ONLY
+)
+
+# Optionally, print the path of the generated JSON file
+message(STATUS "Monitor script generated at: ${CMAKE_BINARY_DIR}/$OUTPUT_MONITOR}")
 
 
 ###################### Project Files ######################
@@ -225,6 +250,16 @@ endif()
 
 # Add target "flash" to Makefile
 add_custom_target(flash
-	COMMAND ${FLASHER} ${FLASHER_FLAGS} ${OUTPUT_BIN} ${FLASH_START_ADDRESS}
+	COMMAND ${FLASHER} ${FLASHER_SOFT_FLAGS} ${OUTPUT_BIN} ${FLASH_START_ADDRESS}
 	COMMENT "Flashing"
+)
+
+add_custom_target(hard
+	COMMAND ${FLASHER} ${FLASHER_HARD_FLAGS} ${OUTPUT_BIN} ${FLASH_START_ADDRESS}
+	COMMENT "Flashing"
+)
+
+add_custom_target(monitor
+	COMMAND ${PY_INTERPRETER} ${OUTPUT_MONITOR}
+	COMMENT "Monitor"
 )
