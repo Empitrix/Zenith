@@ -32,8 +32,8 @@ typedef enum {
 
 
 typedef enum {
-	PIN_OFF = 1u,
-	PIN_ON  = 0u,
+	PIN_OFF = GPIO_PIN_SET,
+	PIN_ON  = GPIO_PIN_RESET,
 } GPIO_STATE;
 
 
