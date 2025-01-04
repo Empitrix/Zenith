@@ -5,6 +5,7 @@
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
+DMA_HandleTypeDef hdma_tim4_ch1;
 
 
 static timer_callback_t timer_callbacks[MAX_TIMER_NUMBER] = { 0 };
@@ -79,30 +80,101 @@ TIM_HandleTypeDef MX_TIM3_Init(int period){
 	return htim3;
 }
 
+// TIM_HandleTypeDef MX_TIM4_Init(int period){
+// 	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+// 	TIM_MasterConfigTypeDef sMasterConfig = {0};
+// 	htim4.Instance = TIM4;
+// 	// htim4.Init.Prescaler = 7200-1;
+// 	htim4.Init.Prescaler = 30-1;
+// 	htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+// 	// htim4.Init.Period = period;
+// 	htim4.Init.Period = 3-1;
+// 	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+// 	htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+// 	if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+// 	{
+// 		Error_Handler();
+// 	}
+// 	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+// 	if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+// 	{
+// 		Error_Handler();
+// 	}
+// 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+// 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+// 	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+// 	{
+// 		Error_Handler();
+// 	}
+// 	return htim4;
+// }
+
+
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+}
+
+
+
 TIM_HandleTypeDef MX_TIM4_Init(int period){
-	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-	TIM_MasterConfigTypeDef sMasterConfig = {0};
-	htim4.Instance = TIM4;
-	htim4.Init.Prescaler = 7200-1;
-	htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim4.Init.Period = period;
-	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-	if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 30-1;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 3-1;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+
+  /* USER CODE END TIM4_Init 2 */
+  HAL_TIM_MspPostInit(&htim4);
 	return htim4;
 }
 
@@ -115,6 +187,7 @@ timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t c
 
 	save_callback(timer.timerNumber, callback);
 
+	MX_DMA_Init();
 
 	switch (timer.timerNumber) {
 		case TIMER_1: break;
@@ -251,5 +324,40 @@ time_t timerGetRemainingTime(const timer_t *timer){
 	// int interval = ((timer->interval) * (7200-1)) - __HAL_TIM_GetCounter(&timer->htim);
 	int interval = (timer->interval * ((int)HAL_GetTickFreq())) - __HAL_TIM_GetCounter(&timer->htim);
 	return interval;
+}
+
+
+void timerStartDMA(timerNumber_t timerNumber, timerChannel_t channel, uint32_t *data, uint16_t length){
+	switch (timerNumber){
+		case TIMER_1:
+			break;
+		case TIMER_2:
+			HAL_TIM_PWM_Start_DMA(&htim2, channel, data, length);
+			break;
+		case TIMER_3:
+			HAL_TIM_PWM_Start_DMA(&htim3, channel, data, length);
+			break;
+		case TIMER_4:
+			HAL_TIM_PWM_Start_DMA(&htim4, channel, data, length);
+			break;
+		default: break;
+	}
+}
+
+void timerStopDMA(timerNumber_t timerNumber, timerChannel_t channel){
+	switch (timerNumber){
+		case TIMER_1:
+			break;
+		case TIMER_2:
+			HAL_TIM_PWM_Stop_DMA(&htim2, channel);
+			break;
+		case TIMER_3:
+			HAL_TIM_PWM_Stop_DMA(&htim3, channel);
+			break;
+		case TIMER_4:
+			HAL_TIM_PWM_Stop_DMA(&htim4, channel);
+			break;
+		default: break;
+	}
 }
 

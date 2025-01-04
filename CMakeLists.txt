@@ -137,6 +137,7 @@ set(PROJECT_SOURCES
 	${SYSTEM_SOURCES}          # System sources
 	${SELECTED_APP_SOURCES}    # selected application sources
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder/encoder.c"
+	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel/neopixel.c"
 )
 
 
@@ -148,6 +149,7 @@ set(PROJECT_INCLUDES
 	"${MCU_BASE_DIR}/CMSIS/Include"
 	"${BASE_DIR}"              # Board Includes
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder"
+	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel"
 )
 
 foreach(DIR ${PROJECT_INCLUDES})

@@ -9,6 +9,7 @@ list(APPEND SUPPORTED_APPLICATIONS
 	"${CMAKE_CURRENT_SOURCE_DIR}/btn-interrupt"
 	"${CMAKE_CURRENT_SOURCE_DIR}/timer"
 	"${CMAKE_CURRENT_SOURCE_DIR}/rotary-encoder"
+	"${CMAKE_CURRENT_SOURCE_DIR}/neopixel"
 )
 
 

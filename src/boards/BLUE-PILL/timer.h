@@ -1,4 +1,5 @@
 #include "main.h"
+#include "stm32f1xx_hal_tim.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -44,6 +45,20 @@ void timerPause(timer_t *timer);
 void timerResume(timer_t *timer);
 
 time_t timerGetRemainingTime(const timer_t *timer);
+
+
+
+typedef enum {
+	TIMER_CH_1 = TIM_CHANNEL_1,
+	TIMER_CH_2 = TIM_CHANNEL_2,
+	TIMER_CH_3 = TIM_CHANNEL_3,
+	TIMER_CH_4 = TIM_CHANNEL_4,
+	TIMER_CH_A = TIM_CHANNEL_ALL,
+} timerChannel_t;
+
+
+void timerStartDMA(timerNumber_t timerNumber, timerChannel_t channel, uint32_t *data, uint16_t length);
+void timerStopDMA(timerNumber_t timerNumber, timerChannel_t channel);
 
 
 #endif
