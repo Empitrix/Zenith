@@ -143,9 +143,9 @@ void serialPrint(const char * frmt, ...){
 	va_end(arglist);
 
 	if(serialType == UART_SERIAL){
-		HAL_UART_Transmit(&huart3, (uint8_t *)tmp, sizeof(tmp), 1000);
+		HAL_UART_Transmit(&huart3, (uint8_t *)tmp, strlen(tmp) * sizeof(uint8_t), 1000);
 	} else {
-		CDC_Transmit_FS((uint8_t *)tmp, sizeof(tmp));
+		CDC_Transmit_FS((uint8_t *)tmp, strlen(tmp) * sizeof(uint8_t));
 	}
 }
 
