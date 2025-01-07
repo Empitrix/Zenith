@@ -62,9 +62,15 @@ unset(BASE_DIR)
 unset(TARGET_DEF)
 unset(MCU_BASE_DIR)
 
-# Default Serial Ports
-set(SERIAL_PORT "/dev/ttyUSB0")
-set(SERIAL_SPEED "115200")
+# SERIAL
+if(NOT DEFINED SERIAL_PORT)
+	set(SERIAL_PORT "/dev/ttyUSB0")
+endif()
+if(NOT DEFINED SERIAL_SPEED)
+	set(SERIAL_SPEED "115200")
+endif()
+message(STATUS "Seiral Port: ${SERIAL_PORT}")
+message(STATUS "Seiral Speed: ${SERIAL_SPEED}")
 
 
 # Update target board if defined
@@ -128,6 +134,23 @@ file(GLOB CORE_SOURCES   "${MCU_BASE_DIR}/Core/Src/*.c")
 file(GLOB SYSTEM_SOURCES "${MCU_BASE_DIR}/System/*.c")
 
 
+###################### CDC ######################
+
+# Middlewares/c
+file(GLOB MIDDLEWARES_SRC_FILES "${MCU_BASE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/*.c")
+file(GLOB MIDDLEWARES_CORE_FILES "${MCU_BASE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/*.c")
+# Middlewares/h
+set(MIDDLEWARES_INC_FILES "${MCU_BASE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc")
+set(MIDDLEWARES_CORE_HEADER_FILES "${MCU_BASE_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Inc")
+
+# USB_DEVICE/c
+file(GLOB USB_DEVICE_APP_SOURCES "${MCU_BASE_DIR}/USB_DEVICE/App/*.c")
+file(GLOB USB_DEVICE_TARGET_SOURCES "${MCU_BASE_DIR}/USB_DEVICE/Target/*.c")
+# USB_DEVICE/h
+set(USB_DEVICE_APP_HEADERS "${MCU_BASE_DIR}/USB_DEVICE/App")
+set(USB_DEVICE_TARGET_HEADERS "${MCU_BASE_DIR}/USB_DEVICE/Target")
+
+
 # List source files here
 set(PROJECT_SOURCES
 	${BOARD_SOURCES}           # Board Sources
@@ -136,6 +159,14 @@ set(PROJECT_SOURCES
 	${SOURCES_S}               # Startup sources
 	${SYSTEM_SOURCES}          # System sources
 	${SELECTED_APP_SOURCES}    # selected application sources
+
+	# CDC
+	${MIDDLEWARES_SRC_FILES}   
+	${MIDDLEWARES_CORE_FILES}
+
+	${USB_DEVICE_APP_SOURCES}
+	${USB_DEVICE_TARGET_SOURCES}
+
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder/encoder.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel/neopixel.c"
 )
@@ -148,6 +179,14 @@ set(PROJECT_INCLUDES
 	"${MCU_BASE_DIR}/CMSIS/Headers"
 	"${MCU_BASE_DIR}/CMSIS/Include"
 	"${BASE_DIR}"              # Board Includes
+
+	# CDC
+	${MIDDLEWARES_INC_FILES}
+	${MIDDLEWARES_CORE_HEADER_FILES}
+	${USB_DEVICE_APP_HEADERS}
+	${USB_DEVICE_TARGET_HEADERS}
+
+	# Drivers
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder"
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel"
 )
@@ -172,6 +211,7 @@ enable_language(ASM)
 set(OBJECT_FLAGS
 	"-mcpu=cortex-m3"
 	"-std=gnu11"
+	"-DUSE_HAL_DRIVER"
 	"-DUSE_HAL_DRIVER"
 	"-D${TARGET_DEF}"
 	"-c"

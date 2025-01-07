@@ -19,7 +19,7 @@ timer:
 	@ make -C Release
 
 hello:
-	@ cmake -DAPP="hello-world" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+	@ cmake -DSERIAL_PORT="/dev/ttyACM0" -DAPP="hello-world" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release
 
 test:

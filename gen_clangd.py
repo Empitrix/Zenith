@@ -23,7 +23,10 @@ DIRS:list[str] = [
 	"src/mcu/stm32f1xx/CMSIS/Include",
 	"src/mcu/stm32f1xx/HAL/Inc",
 	"src/mcu/stm32f1xx/HAL/Inc/Legacy",
-
+	"src/mcu/stm32f1xx/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc",
+	"src/mcu/stm32f1xx/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+	"src/mcu/stm32f1xx/USB_DEVICE/App",
+	"src/mcu/stm32f1xx/USB_DEVICE/Target",
 	# Drivers
 	"drivers/encoder",
 ]

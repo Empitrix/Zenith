@@ -3,6 +3,8 @@
 #include "stm32f1xx_hal.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include "usb_device.h"
+#include "usbd_cdc_if.h"
 #include <string.h>
 
 
@@ -10,6 +12,7 @@
 void SystemClock_Config(void){
 	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
 	/** Initializes the RCC Oscillators according to the specified parameters
 	* in the RCC_OscInitTypeDef structure.
@@ -21,22 +24,29 @@ void SystemClock_Config(void){
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK){
-	  Error_Handler();
+		Error_Handler();
 	}
 
-	// Initializes the CPU, AHB and APB buses clocks
-	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+	/** Initializes the CPU, AHB and APB buses clocks
+	*/
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+															|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
 	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
 	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK){
-	  Error_Handler();
+		Error_Handler();
+	}
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+	PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK){
+		Error_Handler();
 	}
 }
+
 
 
 
@@ -106,18 +116,37 @@ void boardInit(void){
 	HAL_Init();
 	SystemClock_Config();
 	MX_GPIO_Init();
-	MX_USART3_UART_Init();
+}
+
+
+serial_t serialType = NO_SERIAL;
+
+
+void serialBegin(serial_t type){
+	if(type == USB_SERIAL){
+		MX_USB_DEVICE_Init();
+	} else {
+		MX_USART3_UART_Init();
+	}
+	serialType = type;
 }
 
 
 void serialPrint(const char * frmt, ...){
+	if(serialType == NO_SERIAL){ return; }
+
 	char tmp[1024] = { 0 };
 	// char *tmp = calloc(1024, sizeof(char));
 	va_list arglist;
 	va_start(arglist, frmt);
 	vsprintf(tmp, frmt, arglist);
 	va_end(arglist);
-	HAL_UART_Transmit(&huart3, tmp, sizeof(tmp), 1000);
+
+	if(serialType == UART_SERIAL){
+		HAL_UART_Transmit(&huart3, (uint8_t *)tmp, sizeof(tmp), 1000);
+	} else {
+		CDC_Transmit_FS((uint8_t *)tmp, sizeof(tmp));
+	}
 }
 
 
@@ -128,6 +157,14 @@ void delayMs(uint32_t milliseconds){
 	HAL_Delay(milliseconds);
 }
 
+// void delayUs(uint32_t us){
+// 	__HAL_TIM_SET_COUNTER(&htim1,0);
+// 	while (__HAL_TIM_GET_COUNTER(&htim1) < us);
+// }
+
 int boardGetTick(void){
 	return (uint32_t)HAL_GetTick();
 }
+
+
+
