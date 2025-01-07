@@ -27,6 +27,12 @@ set(OUTPUT_MONITOR  "monitor.py")
 set(C_COMPILER "arm-none-eabi-gcc")
 set(C_OBJCOPY  "arm-none-eabi-objcopy")
 
+# Debugger
+set(C_DEBUGGER  "arm-none-eabi-gdb")
+set(DEBUGGER_TARGET_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config/stm32f1x.cfg")
+set(DEBUGGER_PROGRAMMER_CONFIG  "${CMAKE_CURRENT_SOURCE_DIR}/config/stlink-v2.cfg")
+
+
 set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 
@@ -305,3 +311,22 @@ add_custom_target(monitor
 	COMMAND ${PY_INTERPRETER} ${OUTPUT_MONITOR}
 	COMMENT "Monitor"
 )
+
+
+###################### Debugger ######################
+
+add_custom_target(debugger_server
+	COMMAND openocd -f ${DEBUGGER_PROGRAMMER_CONFIG} -f ${DEBUGGER_TARGET_CONFIG}
+	COMMENT "Starting OpenOCD server."
+)
+
+add_custom_target(debugger_start
+	COMMAND ${C_DEBUGGER} ${OUTPUT_ELF}
+	COMMENT "Starting GDB with ${OUTPUT_ELF} file.\nUse \"target extended-remote localhost:3333\""
+)
+
+add_custom_target(debugger_list
+	COMMAND sudo netstat -tulpn | grep openocd
+	COMMENT "List all of the debugging server (OpenOCD) ports."
+)
+
