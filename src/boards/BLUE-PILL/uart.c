@@ -4,6 +4,7 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "uart.h"
+#include "gpio.h"
 
 #define STDOUT_FILENO   1
 #define STDERR_FILENO   2
@@ -83,7 +84,8 @@ void serialPrint(const char * frmt, ...){
 
 
 void uartSetSTDOUT(uart_t *uart){ uart_write = *uart; }
-void uartSetSTDOIN(uart_t *uart){ uart_read = *uart; }
+void uartSetSTDIN(uart_t *uart){ uart_read = *uart; }
+
 
 
 // Update 'printf'
@@ -104,5 +106,31 @@ int _write(int file, char *ptr, int len){
 		default: break;
 	}
 	return 0;
+}
+
+
+
+#define RX_BUFFER_SIZE 256
+static volatile uint8_t rxBuffer[RX_BUFFER_SIZE];
+static volatile uint8_t rxLength = 0;
+
+
+int _read(int file, char *ptr, int len) {
+	(void)file;
+
+	memset((char *)rxBuffer, '\0', sizeof(rxBuffer));
+	rxLength = 0;
+
+	if(uart_read.type == VIRTUAL_SERIAL){
+		while(rxLength == 0){}  // Wait for input
+		strcpy(ptr, (char *)rxBuffer);
+	}
+
+	return rxLength;
+}
+
+void USB_CDC_RxHandler(uint8_t* Buf, uint32_t Len){
+	strcpy((char *)rxBuffer, (char *)Buf);
+	rxLength = Len;
 }
 

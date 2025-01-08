@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include "main.h"
 
-#ifndef __BOARD_GPIO__
-#define __BOARD_GPIO__
+#ifndef __BOARD_UART__
+#define __BOARD_UART__
 
 typedef enum {
 	UART1_SERIAL,
@@ -29,7 +29,7 @@ static volatile uart_t uart_write, uart_read;
 
 // void uartInit(serial_t type, int baudrate);
 void uartSetSTDOUT(uart_t *uart);
-void uartSetSTDOIN(uart_t *uart);
+void uartSetSTDIN(uart_t *uart);
 
 
 #endif
