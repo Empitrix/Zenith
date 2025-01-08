@@ -31,12 +31,18 @@ DIRS:list[str] = [
 	"drivers/encoder",
 ]
 
+ADDITIONAL:list[str] = [
+	"-isystem/usr/arm-none-eabi/include",
+]
+
 def main() -> None:
 	cdir:str = os.getcwd();
 	clangd_path:str = f"{cdir}/.clangd"
 	output:str = "CompileFlags:\n\tCompiler: arm-none-eabi-gcc\n\tAdd:\n"
 	for dir in DIRS:
 		output += f'\t\t- "-I{cdir}/{dir}"\n'
+	for parts in ADDITIONAL:
+		output += f'\t\t- "{parts}"\n'
 	output += FLAGS
 	output = output.replace("\t", " " * TAB_SIZE)
 

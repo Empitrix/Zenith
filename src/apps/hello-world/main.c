@@ -1,11 +1,14 @@
 #include "board.h"
-
+#include "uart.h"
+#include <stdio.h>
 
 int main(void){
 	boardInit();
-	serialBegin(USB_SERIAL);
+	uart_t vcom = uartInit(VIRTUAL_SERIAL, 115200);
+	uartSetSTDOUT(&vcom);
+
 	while(1){
-		serialPrint("Hello, World!\n");
-		delayMs(200);
+		printf("Hello, World!\n");
+		delayMs(100);
 	}
 }
