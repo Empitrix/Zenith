@@ -26,6 +26,10 @@ echo:
 	@ cmake -DSERIAL_PORT="/dev/ttyACM0" -DAPP="echo" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release
 
+capture:
+	@ cmake -DSERIAL_PORT="/dev/ttyACM0" -DAPP="capture" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+	@ make -C Release
+
 test:
 	@ cmake -DAPP="test" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release

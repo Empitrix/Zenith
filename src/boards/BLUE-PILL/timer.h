@@ -9,6 +9,12 @@
 
 #define MAX_TIMER_NUMBER 4
 
+#define TIMER_CLOCK 72000000
+#define S(interval) (interval * 1000000)
+#define MS(interval) (interval * 1000)
+#define US(interval) (interval)
+
+
 typedef enum {
 	TIMER_1 = TIM1_BASE,
 	TIMER_2 = TIM2_BASE,

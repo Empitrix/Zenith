@@ -29,11 +29,11 @@ void save_callback(timerNumber_t tn, timer_callback_t clbk){
 
 
 
-TIM_HandleTypeDef MX_TIM2_Init(int period){
+TIM_HandleTypeDef MX_TIM2_Init(int prescaler, int period){
 	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
 	htim2.Instance = TIM2;
-	htim2.Init.Prescaler = 7200-1;
+	htim2.Init.Prescaler = prescaler;
 	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim2.Init.Period = period;
 	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -53,11 +53,11 @@ TIM_HandleTypeDef MX_TIM2_Init(int period){
 	return htim2;
 }
 
-TIM_HandleTypeDef MX_TIM3_Init(int period){
+TIM_HandleTypeDef MX_TIM3_Init(int prescaler, int period){
 	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
 	htim3.Instance = TIM3;
-	htim3.Init.Prescaler = 7200-1;
+	htim3.Init.Prescaler = prescaler;
 	htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim3.Init.Period = period;
 	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -125,7 +125,7 @@ static void MX_DMA_Init(void)
 
 
 
-TIM_HandleTypeDef MX_TIM4_Init(int period){
+TIM_HandleTypeDef MX_TIM4_Init(int prescaler, int period){
 
   /* USER CODE BEGIN TIM4_Init 0 */
 
@@ -139,9 +139,9 @@ TIM_HandleTypeDef MX_TIM4_Init(int period){
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 30-1;
+  htim4.Init.Prescaler = prescaler;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 3-1;
+  htim4.Init.Period = period;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -178,10 +178,29 @@ TIM_HandleTypeDef MX_TIM4_Init(int period){
 	return htim4;
 }
 
-timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t callback, int start){
+
+typedef struct {} interval_t;
+
+
+void calc_interval(int interval_us, int *period, int *prescaler){
+
+	int ticks = (interval_us * 72000000) / 1000000;
+	*prescaler = (ticks / 65536);
+	*period = (ticks / (*prescaler + 1)) - 1;
+	// int timer_frequency = TIMER_CLOCK;
+	// while (interval_us > 65535) {
+	// 	(*prescaler)++;
+	// 	interval_us /= 2;
+	// }
+	// *prescaler = (1 << *prescaler) - 1;
+	// timer_frequency /= (*prescaler + 1);
+	// *period = (timer_frequency * interval_us) / 1000000 - 1;
+}
+
+timer_t timerInit(timerNumber_t timerNumber, time_t interval_us, timer_callback_t callback, int start){
 	timer_t timer = { 0 };
 
-	timer.interval = (int)interval * 10;
+	timer.interval = interval_us;
 	timer.timerNumber = timerNumber;
 	timer.callback = callback;
 
@@ -189,11 +208,17 @@ timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t c
 
 	MX_DMA_Init();
 
+
+	int init_prescaler = 0;
+	int init_period = 0;
+	calc_interval(interval_us, &init_period, &init_prescaler);
+
+
 	switch (timer.timerNumber) {
 		case TIMER_1: break;
-		case TIMER_2: timer.htim = MX_TIM2_Init(timer.interval); break;
-		case TIMER_3: timer.htim = MX_TIM3_Init(timer.interval); break;
-		case TIMER_4: timer.htim = MX_TIM4_Init(timer.interval); break;
+		case TIMER_2: timer.htim = MX_TIM2_Init(init_prescaler, init_period); break;
+		case TIMER_3: timer.htim = MX_TIM3_Init(init_prescaler, init_period); break;
+		case TIMER_4: timer.htim = MX_TIM4_Init(init_prescaler, init_period); break;
 	}
 
 	timer.running = 0;
@@ -246,13 +271,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
 /* timerSetInterval: update interval */
 void timerSetInterval(timer_t *timer, time_t interval){
-	timer->interval = (int)interval * 10;
+	// timer->interval = (int)interval * 10;
+
+	int period = 0;
+	int prescaler = 0;
+
+	calc_interval(interval, &period, &prescaler);
 
 	switch (timer->timerNumber) {
 		case TIMER_1: break;
-		case TIMER_2: timer->htim = MX_TIM2_Init(timer->interval); break;
-		case TIMER_3: timer->htim = MX_TIM3_Init(timer->interval); break;
-		case TIMER_4: timer->htim = MX_TIM4_Init(timer->interval); break;
+		case TIMER_2: timer->htim = MX_TIM2_Init(prescaler, period); break;
+		case TIMER_3: timer->htim = MX_TIM3_Init(prescaler, period); break;
+		case TIMER_4: timer->htim = MX_TIM4_Init(prescaler, period); break;
 	}
 
 	HAL_TIM_Base_Start_IT(&timer->htim);
