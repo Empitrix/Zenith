@@ -6,12 +6,26 @@
 
 int main(void){
 	boardInit();
-	uart_t vcom = uartInit(VIRTUAL_SERIAL, 115200);
-	uartSetSTDOUT(&vcom);
+	uart_t usbCDC = uartInit(USBCDC, 115200);
+	uart_t uart1 = uartInit(UART1, 115200);
+	uart_t uart2 = uartInit(UART2, 115200);
+	uart_t uart3 = uartInit(UART3, 115200);
+
 
 	while(1){
-		printf("Hello, World!\n");
-		delayMs(10);
+
+		uartSetSTDOUT(&usbCDC);
+		printf("Hello, from USB CDC\n");
+
+		uartSetSTDOUT(&uart1);
+		printf("Hello, from UART 1\n");
+
+		uartSetSTDOUT(&uart2);
+		printf("Hello, from UART 2\n");
+
+		uartSetSTDOUT(&uart3);
+		printf("Hello, from UART 3\n");
+
 	}
 }
 

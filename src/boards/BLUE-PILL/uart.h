@@ -5,11 +5,10 @@
 #define __BOARD_UART__
 
 typedef enum {
-	UART1_SERIAL,
-	UART2_SERIAL,
-	UART3_SERIAL,
-	VIRTUAL_SERIAL,
-	NO_SERIAL
+	UART1,
+	UART2,
+	UART3,
+	USBCDC,
 } serial_t;
 
 
