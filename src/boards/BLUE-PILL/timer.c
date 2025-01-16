@@ -391,3 +391,99 @@ void timerStopDMA(timerNumber_t timerNumber, timerChannel_t channel){
 	}
 }
 
+
+
+static timer_callback_t capture_callbacks[MAX_TIMER_NUMBER * MAX_CHANNEL_NUMBER] = { 0 };
+
+
+void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback){
+
+	TIM_IC_InitTypeDef sConfigIC = {0};
+	sConfigIC.ICPolarity = polarity;
+	sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+	sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+	sConfigIC.ICFilter = 0;
+
+
+
+	int timerNum = 0;
+	int channelNum = 0;
+
+
+	switch(timer->timerNumber){
+		// case TIMER_1:
+		// 	HAL_TIM_Base_Start_IT(&htim1);
+		// 	HAL_TIM_IC_Start_IT(&htim1, channel);
+		// 	timerNum = 0;
+		// 	break;
+		case TIMER_2:
+			HAL_TIM_Base_Start_IT(&htim2);
+			HAL_TIM_IC_Start_IT(&htim2, channel);
+			if(HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, channel) != HAL_OK){
+				Error_Handler();
+			}
+			timerNum = 1;
+			break;
+		case TIMER_3:
+			HAL_TIM_Base_Start_IT(&htim3);
+			HAL_TIM_IC_Start_IT(&htim3, channel);
+			if(HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, channel) != HAL_OK){
+				Error_Handler();
+			}
+			timerNum = 2;
+			break;
+		case TIMER_4:
+			HAL_TIM_Base_Start_IT(&htim4);
+			HAL_TIM_IC_Start_IT(&htim4, channel);
+			if(HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, channel) != HAL_OK){
+				Error_Handler();
+			}
+			timerNum = 3;
+			break;
+		default: break;
+	}
+	
+	switch(channel){
+		case TIMER_CH_1: channelNum = 0; break;
+		case TIMER_CH_2: channelNum = 1; break;
+		case TIMER_CH_3: channelNum = 2; break;
+		case TIMER_CH_4: channelNum = 3; break;
+		default: break;
+	}
+
+	capture_callbacks[(timerNum * MAX_TIMER_NUMBER) + channelNum] = callback;
+}
+
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
+	int timerNum = 0;
+	int channelNum = 0;
+
+	if(htim->Instance == TIM1){
+		timerNum = 0;
+	} else if(htim->Instance == TIM2){
+		timerNum = 1;
+	} else if(htim->Instance == TIM3){
+		timerNum = 2;
+	} else{
+		timerNum = 3;
+	}
+
+	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1){
+		channelNum = 0;
+	} else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2){
+		channelNum = 1;
+	} else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3){
+		channelNum = 2;
+	} else {
+		channelNum = 3;
+	}
+
+	capture_callbacks[(timerNum * MAX_TIMER_NUMBER) + channelNum](*htim);
+}
+
+
+// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
+// 	TIM2_OVC++;
+// }
+

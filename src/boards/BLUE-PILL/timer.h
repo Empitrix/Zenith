@@ -14,6 +14,9 @@
 #define MS(interval) (interval * 1000)
 #define US(interval) (interval)
 
+#define MAX_TIMER_NUMBER 4
+#define MAX_CHANNEL_NUMBER 4
+
 
 typedef enum {
 	TIMER_1 = TIM1_BASE,
@@ -66,5 +69,17 @@ typedef enum {
 void timerStartDMA(timerNumber_t timerNumber, timerChannel_t channel, uint32_t *data, uint16_t length);
 void timerStopDMA(timerNumber_t timerNumber, timerChannel_t channel);
 
+
+
+
+//** CAPTURE **//
+
+typedef enum {
+	CAPTURE_RISING = TIM_INPUTCHANNELPOLARITY_RISING,
+	CAPTURE_FALLIGN = TIM_INPUTCHANNELPOLARITY_FALLING,
+	CAPTURE_BOTHEDGE = TIM_INPUTCHANNELPOLARITY_BOTHEDGE,
+} capturePolarity_t;
+
+void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
 
 #endif
