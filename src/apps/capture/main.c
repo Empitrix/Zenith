@@ -1,23 +1,34 @@
 #include "board.h"
 #include "gpio.h"
+#include "uart.h"
 #include "timer.h"
+#include <stdio.h>
 
-gpio_t led1;
-gpio_t led2;
 
-void led1Toggle(timeHandle_t _){ gpinToggle(&led1); }
-void led2Toggle(timeHandle_t _){ gpinToggle(&led2); }
+void clkbk(timeHandle_t _){ }
+
+void callback(timeHandle_t htim){
+	// printf("I feel something! (%d)\n", (int)htim.Instance->CCR1);
+	printf("Callback! Counter: %d, CCR: %d\n", (int)htim.Instance->CNT, (int)htim.Instance->CCR2);
+}
+
 
 int main(void){
 	boardInit();
+	uart_t uart = uartInit(USBCDC, 115200);
+	uartSetSTDOUT(&uart);
 
-	led1 = gpinInit(A_2, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led2 = gpinInit(A_3, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	
-	timerInit(TIMER_2, MS(200), led1Toggle, 1);
-	timerInit(TIMER_3, US(400), led2Toggle, 1);
 
-	while(1){}
+	gpinInit(B_5, GPIO_INPUT_MODE, GPIN_NO_PULL);
+
+	timer_t timer = timerInit(TIMER_3, 0, clkbk, 1);
+	timerCaptureInit(&timer, TIMER_CH_2, CAPTURE_RISING, callback);
+
+	while(1){
+
+		// printf("%d\n", (int)TIM3->CCR1);
+		// printf("SOMETHING (%d) (%d)\n", (int)TIM2->CCR1, (int)TIM3->CCR1);
+	}
 	return 0;
 }
 

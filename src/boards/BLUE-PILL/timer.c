@@ -1,4 +1,5 @@
 #include "timer.h"
+#include <stdio.h>
 
 
 // Global Timers
@@ -417,6 +418,7 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 		// 	timerNum = 0;
 		// 	break;
 		case TIMER_2:
+			if(HAL_TIM_IC_Init(&htim2) != HAL_OK){ Error_Handler(); }
 			HAL_TIM_Base_Start_IT(&htim2);
 			HAL_TIM_IC_Start_IT(&htim2, channel);
 			if(HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, channel) != HAL_OK){
@@ -425,6 +427,7 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 			timerNum = 1;
 			break;
 		case TIMER_3:
+			if(HAL_TIM_IC_Init(&htim3) != HAL_OK){ Error_Handler(); }
 			HAL_TIM_Base_Start_IT(&htim3);
 			HAL_TIM_IC_Start_IT(&htim3, channel);
 			if(HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, channel) != HAL_OK){
@@ -433,6 +436,7 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 			timerNum = 2;
 			break;
 		case TIMER_4:
+			if(HAL_TIM_IC_Init(&htim4) != HAL_OK){ Error_Handler(); }
 			HAL_TIM_Base_Start_IT(&htim4);
 			HAL_TIM_IC_Start_IT(&htim4, channel);
 			if(HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, channel) != HAL_OK){
@@ -479,6 +483,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 		channelNum = 3;
 	}
 
+	// printf("INNER: %ld\n", (long unsigned int)TIM3->CCR1);
 	capture_callbacks[(timerNum * MAX_TIMER_NUMBER) + channelNum](*htim);
 }
 
