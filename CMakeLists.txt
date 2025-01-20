@@ -130,7 +130,7 @@ configure_file(
 )
 
 # Optionally, print the path of the generated JSON file
-message(STATUS "Monitor script generated at: ${CMAKE_BINARY_DIR}/$OUTPUT_MONITOR}")
+message(STATUS "Monitor script generated at: ${CMAKE_BINARY_DIR}/${OUTPUT_MONITOR}")
 
 
 ###################### Project Files ######################

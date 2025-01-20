@@ -1,5 +1,4 @@
 #include "timer.h"
-#include <stdio.h>
 
 
 // Global Timers
@@ -184,22 +183,14 @@ typedef struct {} interval_t;
 
 
 void calc_interval(int interval_us, int *period, int *prescaler){
-
 	int ticks = (interval_us * 72000000) / 1000000;
 	*prescaler = (ticks / 65536);
 	*period = (ticks / (*prescaler + 1)) - 1;
-	// int timer_frequency = TIMER_CLOCK;
-	// while (interval_us > 65535) {
-	// 	(*prescaler)++;
-	// 	interval_us /= 2;
-	// }
-	// *prescaler = (1 << *prescaler) - 1;
-	// timer_frequency /= (*prescaler + 1);
-	// *period = (timer_frequency * interval_us) / 1000000 - 1;
 }
 
 timer_t timerInit(timerNumber_t timerNumber, time_t interval_us, timer_callback_t callback, int start){
 	timer_t timer = { 0 };
+	timer.capture = (capture_t){ 0 };
 
 	timer.interval = interval_us;
 	timer.timerNumber = timerNumber;
@@ -251,6 +242,13 @@ void timerStop(timer_t *timer){
 
 
 
+void setTimerAutoRelease(timer_t *timr, int enable){
+	timerStop(timr);
+	htim3.Init.AutoReloadPreload = enable ? TIM_AUTORELOAD_PRELOAD_ENABLE : TIM_AUTORELOAD_PRELOAD_DISABLE;
+	timerStart(timr);
+}
+
+
 timerNumber_t idx2timer(int idx){
 	switch (idx) {
 		case 0: return TIMER_1;
@@ -261,14 +259,6 @@ timerNumber_t idx2timer(int idx){
 	}
 }
 
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	for(int i = 0; i < MAX_TIMER_NUMBER; i++){
-		if(htim->Instance == (TIM_TypeDef *)idx2timer(i) && timer_callbacks[i] != NULL){
-			timer_callbacks[i]((timeHandle_t)*htim);
-		}
-	}
-}
 
 /* timerSetInterval: update interval */
 void timerSetInterval(timer_t *timer, time_t interval){
@@ -394,7 +384,8 @@ void timerStopDMA(timerNumber_t timerNumber, timerChannel_t channel){
 
 
 
-static timer_callback_t capture_callbacks[MAX_TIMER_NUMBER * MAX_CHANNEL_NUMBER] = { 0 };
+static timer_callback_t capture_callbacks[MAX_TIMER_CHANNEL_IRQ] = { 0 };
+static capture_t *capture_timers[MAX_TIMER_CHANNEL_IRQ] = { 0 };
 
 
 void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback){
@@ -410,6 +401,10 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 	int timerNum = 0;
 	int channelNum = 0;
 
+	/*
+	// Set to Auto-Reload
+	setTimerAutoRelease(timer, 1);
+	*/
 
 	switch(timer->timerNumber){
 		// case TIMER_1:
@@ -455,7 +450,29 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 		default: break;
 	}
 
-	capture_callbacks[(timerNum * MAX_TIMER_NUMBER) + channelNum] = callback;
+	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
+	capture_callbacks[idx] = callback;
+
+	capture_timers[idx] = &timer->capture;
+}
+
+
+
+//****** HAL callback's ******//
+
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	for(int i = 0; i < MAX_TIMER_NUMBER; i++){
+		if(htim->Instance == (TIM_TypeDef *)idx2timer(i) && timer_callbacks[i] != NULL){
+			timer_callbacks[i]((timeHandle_t)*htim);
+		}
+	}
+
+	for(int i = 0; i < MAX_TIMER_CHANNEL_IRQ; i++){
+		if(capture_timers[i] != NULL){
+			capture_timers[i]->tim_ovc++;
+		}
+	}
 }
 
 
@@ -473,22 +490,42 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 		timerNum = 3;
 	}
 
-	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1){
-		channelNum = 0;
-	} else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2){
-		channelNum = 1;
-	} else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3){
-		channelNum = 2;
-	} else {
-		channelNum = 3;
+	int ccr = 0;
+
+	switch (htim->Channel) {
+		case HAL_TIM_ACTIVE_CHANNEL_1:
+			channelNum = 0;
+			ccr = htim->Instance->CCR1;
+			break;
+		case HAL_TIM_ACTIVE_CHANNEL_2:
+			channelNum = 1;
+			ccr = htim->Instance->CCR2;
+			break;
+		case HAL_TIM_ACTIVE_CHANNEL_3:
+			channelNum = 2;
+			ccr = htim->Instance->CCR3;
+			break;
+		case HAL_TIM_ACTIVE_CHANNEL_4:
+			channelNum = 3;
+			ccr = htim->Instance->CCR4;
+			break;
+		default: break;
 	}
 
-	// printf("INNER: %ld\n", (long unsigned int)TIM3->CCR1);
-	capture_callbacks[(timerNum * MAX_TIMER_NUMBER) + channelNum](*htim);
+	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
+	capture_callbacks[idx](*htim);
+
+	// Update captured frequency
+	if(capture_timers[idx]->state == 0){
+		capture_timers[idx]->t1 = ccr;
+		capture_timers[idx]->tim_ovc = 0;
+		capture_timers[idx]->state = 1;
+	} else if(capture_timers[idx]->state == 1){
+		capture_timers[idx]->t2 = ccr;
+		capture_timers[idx]->ticks = (capture_timers[idx]->t2 + (capture_timers[idx]->tim_ovc * 65536)) - capture_timers[idx]->t1;
+		capture_timers[idx]->frequency = (uint32_t)(F_CLK/capture_timers[idx]->ticks);
+		capture_timers[idx]->state = 0;
+	}
+
 }
-
-
-// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim){
-// 	TIM2_OVC++;
-// }
 

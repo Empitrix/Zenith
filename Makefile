@@ -3,7 +3,7 @@ blue:
 	@ make -C Release
 
 btn:
-	@ cmake -DAPP="btn_interrupt" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+	@ cmake -DAPP="btn-interrupt" -DSERIAL_PORT="/dev/ttyUSB0" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release
 
 neo:
@@ -27,7 +27,7 @@ echo:
 	@ make -C Release
 
 capture:
-	@ cmake -DSERIAL_PORT="/dev/ttyACM0" -DAPP="capture" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+	@ cmake -DSERIAL_PORT="/dev/ttyUSB0" -DAPP="capture" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release
 
 test:

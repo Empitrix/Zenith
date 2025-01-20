@@ -17,6 +17,8 @@
 #define MAX_TIMER_NUMBER 4
 #define MAX_CHANNEL_NUMBER 4
 
+#define MAX_TIMER_CHANNEL_IRQ (MAX_TIMER_NUMBER * MAX_CHANNEL_NUMBER)
+
 
 typedef enum {
 	TIMER_1 = TIM1_BASE,
@@ -32,13 +34,30 @@ typedef TIM_HandleTypeDef timeHandle_t;
 typedef void (*timer_callback_t)(timeHandle_t);
 
 
+#define F_CLK  72000000UL
+#define CAPTURE_FREQUENCY 910
+
+
+typedef struct {
+	uint8_t state;
+	uint32_t t1;
+	uint32_t t2;
+	uint32_t ticks;
+	uint16_t tim_ovc;
+	uint32_t frequency;
+} capture_t;
+
+
 typedef struct {
 	timer_callback_t callback;
 	timerNumber_t timerNumber;
 	time_t interval;
 	TIM_HandleTypeDef htim;
 	bool running;
+
+	capture_t capture;
 } timer_t;
+
 
 timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t callback, int start);
 void timerStart(timer_t *timer);
@@ -81,5 +100,8 @@ typedef enum {
 } capturePolarity_t;
 
 void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
+
+
+#define maxinterval 910
 
 #endif

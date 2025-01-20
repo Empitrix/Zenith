@@ -4,30 +4,25 @@
 #include "timer.h"
 #include <stdio.h>
 
+/*
+Capture the input frequency at pin B5.
+*/
 
-void clkbk(timeHandle_t _){ }
-
-void callback(timeHandle_t htim){
-	// printf("I feel something! (%d)\n", (int)htim.Instance->CCR1);
-	printf("Callback! Counter: %d, CCR: %d\n", (int)htim.Instance->CNT, (int)htim.Instance->CCR2);
-}
-
+void callback(timeHandle_t htim){}
 
 int main(void){
 	boardInit();
-	uart_t uart = uartInit(USBCDC, 115200);
+	uart_t uart = uartInit(UART3, 115200);
 	uartSetSTDOUT(&uart);
+	gpinInit(B_5, GPIO_INPUT_MODE, GPIN_NO_PULL);  // Set B_5 as input
 
-
-	gpinInit(B_5, GPIO_INPUT_MODE, GPIN_NO_PULL);
-
-	timer_t timer = timerInit(TIMER_3, 0, clkbk, 1);
+	// Initialize timer
+	timer_t timer = timerInit(TIMER_3, CAPTURE_FREQUENCY, NULL, 1);
+	// Initialize capture mode
 	timerCaptureInit(&timer, TIMER_CH_2, CAPTURE_RISING, callback);
 
 	while(1){
-
-		// printf("%d\n", (int)TIM3->CCR1);
-		// printf("SOMETHING (%d) (%d)\n", (int)TIM2->CCR1, (int)TIM3->CCR1);
+		printf("Frequency = %u Hz\n", timer.capture.frequency);
 	}
 	return 0;
 }
