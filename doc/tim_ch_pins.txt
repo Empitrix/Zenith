@@ -1,0 +1,73 @@
+B9  => TIM 4 => CH 4
+B8  => TIM 4 => CH 3
+B7  => TIM 4 => CH 2
+B6  => TIM 4 => CH 1
+
+
+B1  => TIM 3 => CH 4
+B0  => TIM 3 => CH 3
+A7  => TIM 3 => CH 2
+A6  => TIM 3 => CH 1
+
+
+
+A3  => TIM 2 => CH 4
+A2  => TIM 2 => CH 3
+A1  => TIM 2 => CH 2
+A0  => TIM 2 => CH 1 (WK UP)
+
+
+
+A11 => TIM 1 => CH 4
+A10 => TIM 1 => CH 3
+A9  => TIM 1 => CH 2
+A8  => TIM 1 => CH 1
+
+
+
+---------
+
+
+B5  => TIM 3 => CH 2
+B4  => TIM 3 => CH 1
+
+
+B11 => TIM 2 => CH 4
+B10 => TIM 2 => CH 3
+B3  => TIM 2 => CH 2
+A15 => TIM 2 => CH 1
+
+
+---------
+
+
+B15 => TIM 1 => CH 3 N
+B14 => TIM 1 => CH 2 N
+B13 => TIM 1 => CH 1 N
+B1  => TIM 1 => CH 3 N
+B0  => TIM 1 => CH 2 N
+
+
+
+
+
+
+
+
+
+B_9_TIM4_CH4 = B_9  | TIMER_4 | CH_4,
+B_8_TIM4_CH3 = B_8  | TIMER_4 | CH_3,
+B_7_TIM4_CH2 = B_7  | TIMER_4 | CH_2,
+B_6_TIM4_CH1 = B_6  | TIMER_4 | CH_1,
+B_1_TIM3_CH4 = B_1  | TIMER_3 | CH_4,
+B_0_TIM3_CH3 = B_0  | TIMER_3 | CH_3,
+A_7_TIM3_CH2 = A_7  | TIMER_3 | CH_2,
+A_6_TIM3_CH1 = A_6  | TIMER_3 | CH_1,
+A_3_TIM2_CH4 = A_3  | TIMER_2 | CH_4,
+A_2_TIM2_CH3 = A_2  | TIMER_2 | CH_3,
+A_1_TIM2_CH2 = A_1  | TIMER_2 | CH_2,
+A_0_TIM2_CH1 = A_0  | TIMER_2 | CH_1,
+A_11_TIM1_CH4 = A_11 | TIMER_1 | CH_4,
+A_10_TIM1_CH3 = A_10 | TIMER_1 | CH_3,
+A_9_TIM1_CH2 = A_9  | TIMER_1 | CH_2,
+A_8_TIM1_CH1 = A_8  | TIMER_1 | CH_1,

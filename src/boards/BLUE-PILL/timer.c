@@ -1,4 +1,5 @@
 #include "timer.h"
+#include <stdio.h>
 
 
 // Global Timers
@@ -262,8 +263,6 @@ timerNumber_t idx2timer(int idx){
 
 /* timerSetInterval: update interval */
 void timerSetInterval(timer_t *timer, time_t interval){
-	// timer->interval = (int)interval * 10;
-
 	int period = 0;
 	int prescaler = 0;
 
@@ -388,8 +387,7 @@ static timer_callback_t capture_callbacks[MAX_TIMER_CHANNEL_IRQ] = { 0 };
 static capture_t *capture_timers[MAX_TIMER_CHANNEL_IRQ] = { 0 };
 
 
-void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback){
-
+void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback){
 	TIM_IC_InitTypeDef sConfigIC = {0};
 	sConfigIC.ICPolarity = polarity;
 	sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -401,10 +399,20 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 	int timerNum = 0;
 	int channelNum = 0;
 
-	/*
+	
+	GPIO_PINS pin = (GPIO_PINS)(config >> 16);
+	timerNumber_t tnum = (timerNumber_t)((config >> 8) & 0xFF);
+	timerChannel_t channel = (timerChannel_t)(config & 0xFF);
+
+
 	// Set to Auto-Reload
-	setTimerAutoRelease(timer, 1);
-	*/
+
+	*timer = timerInit(tnum, CAPTURE_FREQUENCY, callback, 1);
+
+	gpinInit(pin, GPIO_INPUT_MODE, GPIN_NO_PULL);
+	// gpinInit(A_7, GPIO_INPUT_MODE, GPIN_NO_PULL);
+
+	// setTimerAutoRelease(t, 1);
 
 	switch(timer->timerNumber){
 		// case TIMER_1:
@@ -443,18 +451,85 @@ void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t 
 	}
 	
 	switch(channel){
-		case TIMER_CH_1: channelNum = 0; break;
-		case TIMER_CH_2: channelNum = 1; break;
-		case TIMER_CH_3: channelNum = 2; break;
-		case TIMER_CH_4: channelNum = 3; break;
+		case CH_1: channelNum = 0; break;
+		case CH_2: channelNum = 1; break;
+		case CH_3: channelNum = 2; break;
+		case CH_4: channelNum = 3; break;
 		default: break;
 	}
 
 	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
 	capture_callbacks[idx] = callback;
-
 	capture_timers[idx] = &timer->capture;
 }
+
+// void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback){
+// 
+// 	TIM_IC_InitTypeDef sConfigIC = {0};
+// 	sConfigIC.ICPolarity = polarity;
+// 	sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
+// 	sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
+// 	sConfigIC.ICFilter = 0;
+// 
+// 
+// 
+// 	int timerNum = 0;
+// 	int channelNum = 0;
+// 
+// 	/*
+// 	// Set to Auto-Reload
+// 	setTimerAutoRelease(timer, 1);
+// 	*/
+// 
+// 	switch(timer->timerNumber){
+// 		// case TIMER_1:
+// 		// 	HAL_TIM_Base_Start_IT(&htim1);
+// 		// 	HAL_TIM_IC_Start_IT(&htim1, channel);
+// 		// 	timerNum = 0;
+// 		// 	break;
+// 		case TIMER_2:
+// 			if(HAL_TIM_IC_Init(&htim2) != HAL_OK){ Error_Handler(); }
+// 			HAL_TIM_Base_Start_IT(&htim2);
+// 			HAL_TIM_IC_Start_IT(&htim2, channel);
+// 			if(HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, channel) != HAL_OK){
+// 				Error_Handler();
+// 			}
+// 			timerNum = 1;
+// 			break;
+// 		case TIMER_3:
+// 			if(HAL_TIM_IC_Init(&htim3) != HAL_OK){ Error_Handler(); }
+// 			HAL_TIM_Base_Start_IT(&htim3);
+// 			HAL_TIM_IC_Start_IT(&htim3, channel);
+// 			if(HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, channel) != HAL_OK){
+// 				Error_Handler();
+// 			}
+// 			timerNum = 2;
+// 			break;
+// 		case TIMER_4:
+// 			if(HAL_TIM_IC_Init(&htim4) != HAL_OK){ Error_Handler(); }
+// 			HAL_TIM_Base_Start_IT(&htim4);
+// 			HAL_TIM_IC_Start_IT(&htim4, channel);
+// 			if(HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, channel) != HAL_OK){
+// 				Error_Handler();
+// 			}
+// 			timerNum = 3;
+// 			break;
+// 		default: break;
+// 	}
+// 	
+// 	switch(channel){
+// 		case CH_1: channelNum = 0; break;
+// 		case CH_2: channelNum = 1; break;
+// 		case CH_3: channelNum = 2; break;
+// 		case CH_4: channelNum = 3; break;
+// 		default: break;
+// 	}
+// 
+// 	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
+// 	capture_callbacks[idx] = callback;
+// 
+// 	capture_timers[idx] = &timer->capture;
+// }
 
 
 

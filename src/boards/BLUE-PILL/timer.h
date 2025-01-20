@@ -1,4 +1,5 @@
 #include "main.h"
+#include "gpio.h"
 #include "stm32f1xx_hal_tim.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -20,11 +21,18 @@
 #define MAX_TIMER_CHANNEL_IRQ (MAX_TIMER_NUMBER * MAX_CHANNEL_NUMBER)
 
 
+// typedef enum {
+// 	TIMER_1 = TIM1_BASE,
+// 	TIMER_2 = TIM2_BASE,
+// 	TIMER_3 = TIM3_BASE,
+// 	TIMER_4 = TIM4_BASE,
+// } timerNumber_t;
+
 typedef enum {
-	TIMER_1 = TIM1_BASE,
-	TIMER_2 = TIM2_BASE,
-	TIMER_3 = TIM3_BASE,
-	TIMER_4 = TIM4_BASE,
+	TIMER_1,
+	TIMER_2,
+	TIMER_3,
+	TIMER_4,
 } timerNumber_t;
 
 
@@ -44,7 +52,7 @@ typedef struct {
 	uint32_t t2;
 	uint32_t ticks;
 	uint16_t tim_ovc;
-	uint32_t frequency;
+	int frequency;
 } capture_t;
 
 
@@ -77,11 +85,11 @@ time_t timerGetRemainingTime(const timer_t *timer);
 
 
 typedef enum {
-	TIMER_CH_1 = TIM_CHANNEL_1,
-	TIMER_CH_2 = TIM_CHANNEL_2,
-	TIMER_CH_3 = TIM_CHANNEL_3,
-	TIMER_CH_4 = TIM_CHANNEL_4,
-	TIMER_CH_A = TIM_CHANNEL_ALL,
+	CH_1 = TIM_CHANNEL_1,
+	CH_2 = TIM_CHANNEL_2,
+	CH_3 = TIM_CHANNEL_3,
+	CH_4 = TIM_CHANNEL_4,
+	CH_A = TIM_CHANNEL_ALL,
 } timerChannel_t;
 
 
@@ -99,7 +107,36 @@ typedef enum {
 	CAPTURE_BOTHEDGE = TIM_INPUTCHANNELPOLARITY_BOTHEDGE,
 } capturePolarity_t;
 
-void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
+
+
+
+typedef enum {
+	B9_TIM4_CH4  =  (B_9 << 16)  | (TIMER_4 << 8) | CH_4,
+	B8_TIM4_CH3  =  ( B_8 << 16) | (TIMER_4 << 8) | CH_3,
+	B7_TIM4_CH2  =  ( B_7 << 16) | (TIMER_4 << 8) | CH_2,
+	B6_TIM4_CH1  =  ( B_6 << 16) | (TIMER_4 << 8) | CH_1,
+	B1_TIM3_CH4  =  ( B_1 << 16) | (TIMER_3 << 8) | CH_4,
+	B0_TIM3_CH3  =  ( B_0 << 16) | (TIMER_3 << 8) | CH_3,
+
+	B5_TIM3_CH2  =  ( A_7 << 16) | (TIMER_3 << 8) | CH_2,
+	// A7_TIM3_CH2  =  ( A_7 << 16) | (TIMER_3 << 8) | CH_2,
+
+	A6_TIM3_CH1  =  ( A_6 << 16) | (TIMER_3 << 8) | CH_1,
+	A3_TIM2_CH4  =  ( A_3 << 16) | (TIMER_2 << 8) | CH_4,
+	A2_TIM2_CH3  =  ( A_2 << 16) | (TIMER_2 << 8) | CH_3,
+	A1_TIM2_CH2  =  ( A_1 << 16) | (TIMER_2 << 8) | CH_2,
+	A0_TIM2_CH1  =  ( A_0 << 16) | (TIMER_2 << 8) | CH_1,
+	A11_TIM1_CH4 =  (A_11 << 16) | (TIMER_1 << 8) | CH_4,
+	A10_TIM1_CH3 =  (A_10 << 16) | (TIMER_1 << 8) | CH_3,
+	A9_TIM1_CH2  =  ( A_9 << 16) | (TIMER_1 << 8) | CH_2,
+	A8_TIM1_CH1  =  ( A_8 << 16) | (TIMER_1 << 8) | CH_1,
+} tiemrCaptureConfig_t;
+
+
+// void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
+// void timerCaptureInit(tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
+
+void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
 
 
 #define maxinterval 910

@@ -6,7 +6,7 @@
 
 int main(void){
 	boardInit();
-	uart_t vcom = uartInit(VIRTUAL_SERIAL, 115200);
+	uart_t vcom = uartInit(USBCDC, 115200);
 	uartSetSTDOUT(&vcom);
 	uartSetSTDIN(&vcom);
 
