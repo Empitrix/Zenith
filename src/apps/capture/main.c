@@ -8,6 +8,7 @@
 Capture the input frequency at pin B5.
 */
 
+
 void callback(timeHandle_t htim){}
 
 
@@ -17,7 +18,7 @@ int main(void){
 	uartSetSTDOUT(&uart);
 
 	timer_t timer;
-	timerCaptureInit(&timer, B5_TIM3_CH2, CAPTURE_RISING, callback);
+	timerCaptureInit(&timer, B5_TIM3_CH2, CAPTURE_RISING, 0, callback);
 
 	while(1){
 		printf("Frequency: %d\n", timer.capture.frequency);

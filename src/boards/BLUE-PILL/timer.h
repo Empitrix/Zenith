@@ -21,13 +21,6 @@
 #define MAX_TIMER_CHANNEL_IRQ (MAX_TIMER_NUMBER * MAX_CHANNEL_NUMBER)
 
 
-// typedef enum {
-// 	TIMER_1 = TIM1_BASE,
-// 	TIMER_2 = TIM2_BASE,
-// 	TIMER_3 = TIM3_BASE,
-// 	TIMER_4 = TIM4_BASE,
-// } timerNumber_t;
-
 typedef enum {
 	TIMER_1,
 	TIMER_2,
@@ -67,6 +60,7 @@ typedef struct {
 } timer_t;
 
 
+timer_t timerConfigure(timerNumber_t timerNumber, int prescaler, int period, timer_callback_t callback, int start);
 timer_t timerInit(timerNumber_t timerNumber, time_t interval, timer_callback_t callback, int start);
 void timerStart(timer_t *timer);
 void timerStop(timer_t *timer);
@@ -81,7 +75,6 @@ void timerPause(timer_t *timer);
 void timerResume(timer_t *timer);
 
 time_t timerGetRemainingTime(const timer_t *timer);
-
 
 
 typedef enum {
@@ -135,8 +128,9 @@ typedef enum {
 
 // void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
 // void timerCaptureInit(tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
+// void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
 
-void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
+void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, int tickTime, timer_callback_t callback);
 
 
 #define maxinterval 910

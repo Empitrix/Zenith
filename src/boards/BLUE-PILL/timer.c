@@ -189,6 +189,46 @@ void calc_interval(int interval_us, int *period, int *prescaler){
 	*period = (ticks / (*prescaler + 1)) - 1;
 }
 
+
+
+timer_t timerConfigure(timerNumber_t timerNumber, int prescaler, int period, timer_callback_t callback, int start){
+	timer_t timer = { 0 };
+	timer.capture = (capture_t){ 0 };
+
+	timer.interval = period;
+	timer.timerNumber = timerNumber;
+	timer.callback = callback;
+
+	save_callback(timer.timerNumber, callback);
+
+	MX_DMA_Init();
+
+
+	switch (timer.timerNumber) {
+		case TIMER_1: break;
+		case TIMER_2: timer.htim = MX_TIM2_Init(prescaler, period); break;
+		case TIMER_3: timer.htim = MX_TIM3_Init(prescaler, period); break;
+		case TIMER_4: timer.htim = MX_TIM4_Init(prescaler, period); break;
+	}
+
+	timer.running = 0;
+
+	if(start){
+		HAL_TIM_Base_Start_IT(&timer.htim);
+		timer.running = 1;
+	}
+	
+	return timer;
+}
+
+
+timer_t timerInit(timerNumber_t timerNumber, time_t interval_us, timer_callback_t callback, int start){
+	int pre = 0, pri = 0;
+	calc_interval(interval_us, &pri, &pre);
+	return timerConfigure(timerNumber, pre, pri, callback, start);
+}
+
+/*
 timer_t timerInit(timerNumber_t timerNumber, time_t interval_us, timer_callback_t callback, int start){
 	timer_t timer = { 0 };
 	timer.capture = (capture_t){ 0 };
@@ -223,6 +263,7 @@ timer_t timerInit(timerNumber_t timerNumber, time_t interval_us, timer_callback_
 	
 	return timer;
 }
+*/
 
 
 /* timerStart: start timer if not running */
@@ -250,13 +291,13 @@ void setTimerAutoRelease(timer_t *timr, int enable){
 }
 
 
-timerNumber_t idx2timer(int idx){
+timerNumber_t *idx2timer(int idx){
 	switch (idx) {
-		case 0: return TIMER_1;
-		case 1: return TIMER_2;
-		case 2: return TIMER_3;
-		case 3: return TIMER_4;
-		default: return TIMER_2;
+		case 0:  return (timerNumber_t*)TIM1;
+		case 1:  return (timerNumber_t*)TIM2;
+		case 2:  return (timerNumber_t*)TIM3;
+		case 3:  return (timerNumber_t*)TIM4;
+		default: return (timerNumber_t*)TIM2;
 	}
 }
 
@@ -387,7 +428,7 @@ static timer_callback_t capture_callbacks[MAX_TIMER_CHANNEL_IRQ] = { 0 };
 static capture_t *capture_timers[MAX_TIMER_CHANNEL_IRQ] = { 0 };
 
 
-void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback){
+void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, int tickTime, timer_callback_t callback){
 	TIM_IC_InitTypeDef sConfigIC = {0};
 	sConfigIC.ICPolarity = polarity;
 	sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -405,13 +446,13 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 	timerChannel_t channel = (timerChannel_t)(config & 0xFF);
 
 
-	// Set to Auto-Reload
+	int prescaler = 72000000 / (1.0 / tickTime);
 
-	*timer = timerInit(tnum, CAPTURE_FREQUENCY, callback, 1);
-
+	// *timer = timerInit(tnum, CAPTURE_FREQUENCY, callback, 1);
+	*timer = timerConfigure(tnum, prescaler, 65535, callback, 1);
 	gpinInit(pin, GPIO_INPUT_MODE, GPIN_NO_PULL);
-	// gpinInit(A_7, GPIO_INPUT_MODE, GPIN_NO_PULL);
 
+	// Set to Auto-Reload
 	// setTimerAutoRelease(t, 1);
 
 	switch(timer->timerNumber){
@@ -463,78 +504,9 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 	capture_timers[idx] = &timer->capture;
 }
 
-// void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback){
-// 
-// 	TIM_IC_InitTypeDef sConfigIC = {0};
-// 	sConfigIC.ICPolarity = polarity;
-// 	sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
-// 	sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
-// 	sConfigIC.ICFilter = 0;
-// 
-// 
-// 
-// 	int timerNum = 0;
-// 	int channelNum = 0;
-// 
-// 	/*
-// 	// Set to Auto-Reload
-// 	setTimerAutoRelease(timer, 1);
-// 	*/
-// 
-// 	switch(timer->timerNumber){
-// 		// case TIMER_1:
-// 		// 	HAL_TIM_Base_Start_IT(&htim1);
-// 		// 	HAL_TIM_IC_Start_IT(&htim1, channel);
-// 		// 	timerNum = 0;
-// 		// 	break;
-// 		case TIMER_2:
-// 			if(HAL_TIM_IC_Init(&htim2) != HAL_OK){ Error_Handler(); }
-// 			HAL_TIM_Base_Start_IT(&htim2);
-// 			HAL_TIM_IC_Start_IT(&htim2, channel);
-// 			if(HAL_TIM_IC_ConfigChannel(&htim2, &sConfigIC, channel) != HAL_OK){
-// 				Error_Handler();
-// 			}
-// 			timerNum = 1;
-// 			break;
-// 		case TIMER_3:
-// 			if(HAL_TIM_IC_Init(&htim3) != HAL_OK){ Error_Handler(); }
-// 			HAL_TIM_Base_Start_IT(&htim3);
-// 			HAL_TIM_IC_Start_IT(&htim3, channel);
-// 			if(HAL_TIM_IC_ConfigChannel(&htim3, &sConfigIC, channel) != HAL_OK){
-// 				Error_Handler();
-// 			}
-// 			timerNum = 2;
-// 			break;
-// 		case TIMER_4:
-// 			if(HAL_TIM_IC_Init(&htim4) != HAL_OK){ Error_Handler(); }
-// 			HAL_TIM_Base_Start_IT(&htim4);
-// 			HAL_TIM_IC_Start_IT(&htim4, channel);
-// 			if(HAL_TIM_IC_ConfigChannel(&htim4, &sConfigIC, channel) != HAL_OK){
-// 				Error_Handler();
-// 			}
-// 			timerNum = 3;
-// 			break;
-// 		default: break;
-// 	}
-// 	
-// 	switch(channel){
-// 		case CH_1: channelNum = 0; break;
-// 		case CH_2: channelNum = 1; break;
-// 		case CH_3: channelNum = 2; break;
-// 		case CH_4: channelNum = 3; break;
-// 		default: break;
-// 	}
-// 
-// 	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
-// 	capture_callbacks[idx] = callback;
-// 
-// 	capture_timers[idx] = &timer->capture;
-// }
-
 
 
 //****** HAL callback's ******//
-
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	for(int i = 0; i < MAX_TIMER_NUMBER; i++){
