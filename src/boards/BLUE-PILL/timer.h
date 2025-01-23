@@ -46,6 +46,8 @@ typedef struct {
 	uint32_t ticks;
 	uint16_t tim_ovc;
 	int frequency;
+
+	int ccr;
 } capture_t;
 
 

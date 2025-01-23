@@ -62,7 +62,8 @@ TIM_HandleTypeDef MX_TIM3_Init(int prescaler, int period){
 	htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim3.Init.Period = period;
 	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	// htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 	if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
 	{
 		Error_Handler();
@@ -446,10 +447,12 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 	timerChannel_t channel = (timerChannel_t)(config & 0xFF);
 
 
-	int prescaler = 72000000 / (1.0 / tickTime);
+	// int prescaler = 72000000 / (1.0 / tickTime);
+	// int prescaler = 72000000 / (1.0 / 0.00001);
+	// int prescaler = (tickTime * 72000000) / 1000000;
 
-	// *timer = timerInit(tnum, CAPTURE_FREQUENCY, callback, 1);
-	*timer = timerConfigure(tnum, prescaler, 65535, callback, 1);
+	// *timer = timerConfigure(tnum, prescaler, 65535, NULL, 1);
+	*timer = timerInit(tnum, tickTime, callback, 1);
 	gpinInit(pin, GPIO_INPUT_MODE, GPIN_NO_PULL);
 
 	// Set to Auto-Reload
@@ -537,8 +540,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 		timerNum = 3;
 	}
 
-	int ccr = 0;
 
+	int ccr = 0;
 	switch (htim->Channel) {
 		case HAL_TIM_ACTIVE_CHANNEL_1:
 			channelNum = 0;
@@ -559,20 +562,23 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 		default: break;
 	}
 
+
+
 	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
+
+
 	capture_callbacks[idx](*htim);
 
-	// Update captured frequency
+
+	// capture_timers[idx]->ccr = ccr;
+
+	capture_timers[idx]->ccr = capture_timers[idx]->tim_ovc;
+	
 	if(capture_timers[idx]->state == 0){
-		capture_timers[idx]->t1 = ccr;
 		capture_timers[idx]->tim_ovc = 0;
 		capture_timers[idx]->state = 1;
 	} else if(capture_timers[idx]->state == 1){
-		capture_timers[idx]->t2 = ccr;
-		capture_timers[idx]->ticks = (capture_timers[idx]->t2 + (capture_timers[idx]->tim_ovc * 65536)) - capture_timers[idx]->t1;
-		capture_timers[idx]->frequency = (uint32_t)(F_CLK/capture_timers[idx]->ticks);
 		capture_timers[idx]->state = 0;
 	}
-
 }
 
