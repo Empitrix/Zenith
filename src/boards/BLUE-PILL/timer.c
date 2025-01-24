@@ -1,5 +1,6 @@
 #include "timer.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 // Global Timers
@@ -447,12 +448,8 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 	timerChannel_t channel = (timerChannel_t)(config & 0xFF);
 
 
-	// int prescaler = 72000000 / (1.0 / tickTime);
-	// int prescaler = 72000000 / (1.0 / 0.00001);
-	// int prescaler = (tickTime * 72000000) / 1000000;
-
-	// *timer = timerConfigure(tnum, prescaler, 65535, NULL, 1);
-	*timer = timerInit(tnum, tickTime, callback, 1);
+	int prescaler = (tickTime * 72000000) / 1000000;
+	*timer = timerConfigure(tnum, prescaler, 65535, NULL, 1);
 	gpinInit(pin, GPIO_INPUT_MODE, GPIN_NO_PULL);
 
 	// Set to Auto-Reload
@@ -526,6 +523,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 }
 
 
+static int previusTicks = 0;
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 	int timerNum = 0;
 	int channelNum = 0;
@@ -563,22 +562,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 	}
 
 
-
 	int idx = (timerNum * MAX_TIMER_NUMBER) + channelNum;
-
-
 	capture_callbacks[idx](*htim);
 
-
-	// capture_timers[idx]->ccr = ccr;
-
-	capture_timers[idx]->ccr = capture_timers[idx]->tim_ovc;
-	
-	if(capture_timers[idx]->state == 0){
-		capture_timers[idx]->tim_ovc = 0;
-		capture_timers[idx]->state = 1;
-	} else if(capture_timers[idx]->state == 1){
-		capture_timers[idx]->state = 0;
-	}
+	capture_timers[idx]->ccr = ccr - previusTicks;
+	previusTicks = ccr;
 }
 

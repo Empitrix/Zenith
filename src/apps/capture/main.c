@@ -3,19 +3,16 @@
 #include "uart.h"
 #include "timer.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
 Capture the input frequency at pin B5.
 */
 
 
-gpio_t g;
-
 void callback(timeHandle_t htim){}
 
-void calbk(timeHandle_t htim){
-	gpinToggle(&g);
-}
+void calbk(timeHandle_t htim){}
 
 
 
@@ -24,24 +21,15 @@ int main(void){
 	uart_t uart = uartInit(UART3, 115200);
 	uartSetSTDOUT(&uart);
 
-	g = gpinInit(B_4, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-
-	int tim = 20;
+	int ticks = 13;
 
 	timer_t timer;
-	timerCaptureInit(&timer, B5_TIM3_CH2, CAPTURE_RISING, tim, calbk);
+	timerCaptureInit(&timer, B5_TIM3_CH2, CAPTURE_RISING, ticks, calbk);
 
-	int toggle = 0;
-	int previus = 0;
-
+	int rpm = 0;
 	while(1){
-		printf("CCR: %d\n", timer.capture.ccr);
-
-		toggle++;
-		int a = timer.capture.ccr - previus;
-		if(toggle == 2){ printf("             %d (%d)\n", a, a * tim); toggle = 0;} else {
-		 previus = timer.capture.ccr; 
-		}
+		rpm = 60 * (1 / ((timer.capture.ccr * ticks) * 0.000001));
+		printf("%d (%d) RPM: %d\n", abs(timer.capture.ccr), abs(timer.capture.ccr * ticks), rpm);
 		delayMs(100);
 	}
 
