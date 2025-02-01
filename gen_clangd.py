@@ -29,6 +29,7 @@ DIRS:list[str] = [
 	"src/mcu/stm32f1xx/USB_DEVICE/Target",
 	# Drivers
 	"drivers/encoder",
+	"drivers/neopixel",
 ]
 
 ADDITIONAL:list[str] = [

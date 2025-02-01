@@ -1,4 +1,5 @@
 #include "neopixel.h"
+#include "stm32f1xx_hal_tim.h"
 #include "timer.h"
 #include "board.h"
 #include <stdint.h>
@@ -18,19 +19,28 @@ neopixel_t neopixelInit(int numLeds, GPIO_PINS dataIn){
 /* NeopixelShow: Flush All LEDS */
 void neopixelShow(neopixel_t *npxl){
 	for(int i = 0; i < npxl->size; i++){
-		if(npxl->data[i]){
+		if(npxl->data[i]){  // ON
+			// ON 800ns
 			((GPIO_TypeDef *)npxl->dataIn.type)->BSRR = npxl->dataIn.pin;
 			for(int i = 0; i < 48; i++) __asm__("nop");
+			// OFF 450ns
 			((GPIO_TypeDef *)npxl->dataIn.type)->BSRR = (uint32_t)npxl->dataIn.pin << 16u;
 			for(int i = 0; i < 28; i++) __asm__("nop");
-		} else {
+		} else {  // OFF
+			// ON 400ns
 			((GPIO_TypeDef *)npxl->dataIn.type)->BSRR = npxl->dataIn.pin;
 			for(int i = 0; i < 8; i++) __asm__("nop");
+			// OFF 850ns
 			((GPIO_TypeDef *)npxl->dataIn.type)->BSRR = (uint32_t)npxl->dataIn.pin << 16u;
 			for(int i = 0; i < 52; i++) __asm__("nop");
 		}
 	}
 
+
+	// timerStartDMA(TIMER_4, CH_1, npxl->data, 384 * 2);
+	// delayMs(10);
+	// timerStopDMA(TIMER_4, CH_1);
+	// delayMs(10);
 }
 
 

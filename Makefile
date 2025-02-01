@@ -6,6 +6,10 @@ btn:
 	@ cmake -DAPP="btn-interrupt" -DSERIAL_PORT="/dev/ttyUSB0" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release
 
+esc:
+	@ cmake -DAPP="esc" -DSERIAL_PORT="/dev/ttyUSB0" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+	@ make -C Release
+
 neo:
 	@ cmake -DAPP="neopixel" -DBOARD="BLUE-PILL" -DCMAKE_TOOLCHAIN_FILE=cubeide-gcc.cmake  -S ./ -B Release -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
 	@ make -C Release

@@ -1,9 +1,11 @@
 #include "timer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 
 // Global Timers
+TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
@@ -29,6 +31,31 @@ void save_callback(timerNumber_t tn, timer_callback_t clbk){
 }
 
 
+
+TIM_HandleTypeDef MX_TIM1_Init(int prescaler, int period){
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	htim1.Instance = TIM1;
+	htim1.Init.Prescaler = prescaler;
+	htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim1.Init.Period = period;
+	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim1.Init.RepetitionCounter = 0;
+	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	if(HAL_TIM_Base_Init(&htim1) != HAL_OK){
+		Error_Handler();
+	}
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	if(HAL_TIM_ConfigClockSource(&htim1, &sClockSourceConfig) != HAL_OK){
+		Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if(HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK){
+		Error_Handler();
+	}
+	return htim1;
+}
 
 
 TIM_HandleTypeDef MX_TIM2_Init(int prescaler, int period){
@@ -207,7 +234,7 @@ timer_t timerConfigure(timerNumber_t timerNumber, int prescaler, int period, tim
 
 
 	switch (timer.timerNumber) {
-		case TIMER_1: break;
+		case TIMER_1: timer.htim = MX_TIM1_Init(prescaler, period); break;
 		case TIMER_2: timer.htim = MX_TIM2_Init(prescaler, period); break;
 		case TIMER_3: timer.htim = MX_TIM3_Init(prescaler, period); break;
 		case TIMER_4: timer.htim = MX_TIM4_Init(prescaler, period); break;
@@ -456,11 +483,11 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 	// setTimerAutoRelease(t, 1);
 
 	switch(timer->timerNumber){
-		// case TIMER_1:
-		// 	HAL_TIM_Base_Start_IT(&htim1);
-		// 	HAL_TIM_IC_Start_IT(&htim1, channel);
-		// 	timerNum = 0;
-		// 	break;
+		case TIMER_1:
+			HAL_TIM_Base_Start_IT(&htim1);
+			HAL_TIM_IC_Start_IT(&htim1, channel);
+			timerNum = 0;
+			break;
 		case TIMER_2:
 			if(HAL_TIM_IC_Init(&htim2) != HAL_OK){ Error_Handler(); }
 			HAL_TIM_Base_Start_IT(&htim2);
@@ -569,3 +596,57 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 	previusTicks = ccr;
 }
 
+void delayUs(uint16_t us){
+	__HAL_TIM_SET_COUNTER(&htim1, 0);
+	while(__HAL_TIM_GET_COUNTER(&htim1) < us){}
+}
+
+
+
+// void TimerDelay_Init(void)
+// {
+//     int gu32_ticks = (HAL_RCC_GetHCLKFreq() / 1000000);
+//  
+//     TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+//     TIM_MasterConfigTypeDef sMasterConfig = {0};
+//  
+//     htim4.Instance = TIM4;
+//     htim4.Init.Prescaler = gu32_ticks-1;
+//     htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+//     htim4.Init.Period = 65535;
+//     htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+//     htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+//     if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+//     {
+//       Error_Handler();
+//     }
+//     sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+//     if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+//     {
+//       Error_Handler();
+//     }
+//     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+//     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+//     if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+//     {
+//       Error_Handler();
+//     }
+//  
+//     HAL_TIM_Base_Start(&htim4);
+// }
+// 
+// 
+// void delay_us(uint16_t au16_us){
+//     htim4.Instance->CNT = 0;
+//     while (htim4.Instance->CNT < au16_us);
+// }
+
+// #define SYSTICKCLOCK 72000000ULL
+// #define SYSTICKPERUS (SYSTICKCLOCK / 1000000UL)
+// 
+// // delay has to constant expression
+// void delay_us(int delay){
+// 	uint32_t ticks = SYSTICKPERUS * delay;
+// 	uint32_t start_tick = SysTick -> VAL;
+// 	while(SysTick -> VAL - start_tick < ticks);
+// }

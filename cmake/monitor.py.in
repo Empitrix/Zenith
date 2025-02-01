@@ -20,9 +20,13 @@ def main():
 	ser.open()
 
 	while True:
-		time:str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-		prt(f"[blue]{ time }[/blue] { ser.readline().decode("UTF-8").rstrip() }")
-		delay(100)
+		try:
+			time:str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			prt(f"[blue]{ time }[/blue] { ser.readline().decode("UTF-8").rstrip() }")
+			delay(100)
+		except:
+			print("Exiting terminal.");
+			break;
 
 
 if __name__ == "__main__":
