@@ -136,20 +136,5 @@ void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolari
 
 void delayUs(uint16_t us);
 
-#define maxinterval 910
-
-// void TimerDelay_Init(void);
-// void delay_us(int delay);
-// 
-// #define SYSTICK_LOAD (SystemCoreClock/1000000U)
-// #define SYSTICK_DELAY_CALIB (SYSTICK_LOAD >> 1)
-//  
-// #define DELAY_US(us) \
-//     do { \
-//          uint32_t start = SysTick->VAL; \
-//          uint32_t ticks = (us * SYSTICK_LOAD)-SYSTICK_DELAY_CALIB;  \
-//          while((start - SysTick->VAL) < ticks); \
-//     } while (0)
-
 #endif
 

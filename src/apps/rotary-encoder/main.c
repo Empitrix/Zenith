@@ -1,37 +1,37 @@
 #include "board.h"
-#include "gpio.h"
 #include "encoder.h"
+#include "uart.h"
+#include <stdio.h>
 
-gpio_t led, led2, led3;
 encoder_t enc;
 
-void onPressCallback(void *x){
-	gpinToggle(&led);
+/* Encoder's button callback */
+void onPressCallback(void *_){
+	// Reset the encoder's counter
+	encoderResetCounter(&enc);
 }
 
+/* Increment callback */
 void onIncrement(int counter){
-	gpinToggle(&led2);
+	printf("Increment (%d)\n", counter);
 }
 
+/* Decrement callback */
 void onDecrement(int counter){
-	serialPrint("Counter: %d\n", counter);
-	gpinToggle(&led3);
+	printf("Decrement (%d)\n", counter);
 }
-
-int count = 0;
 
 int main(){
+	// Initialize the board
 	boardInit();
 
-	led = gpinInit(C_13, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	// Initialize UART & enable printf
+	uart_t uart = uartInit(UART3, 115200);
+	uartSetSTDOUT(&uart);
 
-	led2 = gpinInit(A_3, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-	led3 = gpinInit(A_4, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
-
+	// Initialize the encoder
 	encoderInit(&enc, A_8, A_9, A_10, onPressCallback, onIncrement, onDecrement);
 
-	while(1){
-		serialPrint("Looping: %d\n", count++);
-		delayMs(100);
-	}
+	while(1) __asm__ volatile ("nop");  // Keep the program running
 }
+

@@ -18,8 +18,12 @@ typedef struct {
 	gpio_t dt;
 	gpio_t clk;
 
-	int state;
-	int lastState;
+	int pos;
+	int lastPos;
+
+	int first;
+	int value;
+	int charge;
 
 } encoder_t;
 
