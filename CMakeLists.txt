@@ -156,6 +156,7 @@ file(GLOB USB_DEVICE_TARGET_SOURCES "${MCU_BASE_DIR}/USB_DEVICE/Target/*.c")
 set(USB_DEVICE_APP_HEADERS "${MCU_BASE_DIR}/USB_DEVICE/App")
 set(USB_DEVICE_TARGET_HEADERS "${MCU_BASE_DIR}/USB_DEVICE/Target")
 
+file(GLOB SSD1306_DRIVER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/drivers/ssd1306/*.c")
 
 # List source files here
 set(PROJECT_SOURCES
@@ -175,6 +176,7 @@ set(PROJECT_SOURCES
 
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder/encoder.c"
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel/neopixel.c"
+	"${SSD1306_DRIVER_SOURCES}"
 )
 
 
@@ -195,6 +197,7 @@ set(PROJECT_INCLUDES
 	# Drivers
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/encoder"
 	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/neopixel"
+	"${CMAKE_CURRENT_SOURCE_DIR}/drivers/ssd1306"
 )
 
 foreach(DIR ${PROJECT_INCLUDES})

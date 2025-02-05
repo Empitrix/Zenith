@@ -30,6 +30,7 @@ DIRS:list[str] = [
 	# Drivers
 	"drivers/encoder",
 	"drivers/neopixel",
+	"drivers/ssd1306",
 ]
 
 ADDITIONAL:list[str] = [
