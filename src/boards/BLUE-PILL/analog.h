@@ -6,8 +6,11 @@
 #ifndef __ANALOG_BLUE_PILL__
 #define __ANALOG_BLUE_PILL__
 
+#define MAX_ANALOG_CHANNELS 10
+
 #define GET_ANALOG_INSTANCE(pin)   ((pin >> 8)  & 0xFF)
 #define GET_ANALOG_PIN(pin)        (pin & 0xFF)
+
 
 typedef enum {
 	ADC_1,
@@ -40,18 +43,21 @@ typedef enum {
 } analogPin_t;
 
 
+typedef void (*analogDMACallback_t)(int);
+
 typedef struct {
 	analogPin_t pin;
 	ADC_HandleTypeDef adc;
 	uint32_t value;
+	analogDMACallback_t callback;
+	ADC_TypeDef *instance;
 } analog_t;
 
-typedef void (*analogDMACallback)(int);
+
 
 analog_t analogInit(analogPin_t pin);
-
-analog_t analogDMAInit(analogPin_t pin, analogDMACallback callback);
-
+void analogDMAInit(analog_t *analog, analogPin_t pin, analogDMACallback_t callback);
 uint32_t analogRead(analog_t *analog);
+
 
 #endif

@@ -9,10 +9,13 @@
 static uint8_t displayBuffer[1024] = { 0 };
 
 
+void callback(int _){}
+
+
 /* oledShowValue: display the value on the OLED screen */
 void oledShowValue(ssd1306_t *display, int value){
 	char valBuf[128] = { 0 };
-	sprintf(valBuf, "V: 0.%d", value);
+	sprintf(valBuf, "V: %d", value);
 	ssd1306ClearAll(display);
 	ssd1306SetCursor(display, 0, 0);
 	ssd1306DrawString(display, valBuf, FONT_16X26, ssd1306White);
@@ -21,16 +24,21 @@ void oledShowValue(ssd1306_t *display, int value){
 
 int main(void){
 	boardInit();
+	uart_t uart = uartInit(UART3, 115200);
+	uartSetSTDOUT(&uart);
 
 	i2c_t i2c = i2cInit(I2C1_B6_B7, 1000000);
 	ssd1306_t display = ssd1306Init(&i2c, SSD1306_I2C_DEV_ADDR, 128, 64, displayBuffer);
 
 
-	analog_t analog = analogInit(ADC1_B1);
+	// analog_t analog = analogInit(ADC1_B1);
+	// analog_t analog = analogDMAInit(ADC1_B1, callback);
+
+	analog_t analog;
+	analogDMAInit(&analog, ADC1_B1, callback);
 
 	while(1){
-		int value = analogRead(&analog);
-		oledShowValue(&display, value);
+		oledShowValue(&display, analog.value);
 		// delayMs(500);
 	}
 	return 0;
