@@ -1,7 +1,6 @@
 #include "analog.h"
 #include "stm32f103xb.h"
 #include "stm32f1xx_hal_adc.h"
-#include <stdio.h>
 
 
 ADC_HandleTypeDef hadc1;
@@ -10,9 +9,7 @@ ADC_HandleTypeDef hadc2;
 // DMA
 DMA_HandleTypeDef hdma_adc1;
 
-
-analog_t* analogBuffer[MAX_ANALOG_CHANNELS] = { NULL };
-
+// analogCallback_t analogBuffer[MAX_ANALOG_CHANNELS + 1] = { NULL };
 
 ADC_HandleTypeDef MX_ADC1_Init(int channel){
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -38,7 +35,6 @@ ADC_HandleTypeDef MX_ADC1_Init(int channel){
 
 
 ADC_HandleTypeDef MX_ADC2_Init(int channel){
-
 	ADC_ChannelConfTypeDef sConfig = {0};
 
 	hadc2.Instance = ADC2;
@@ -85,9 +81,10 @@ analog_t analogInit(analogPin_t pin){
 	int aPin = GET_ANALOG_PIN(pin);
 	int channel = aPin > 8 ? aPin - 8: aPin;
 
-	switch (GET_ANALOG_INSTANCE(pin)) {
-		case ADC_1: analog.adc = MX_ADC1_Init(channel); analog.instance = ADC1; break;
-		case ADC_2: analog.adc = MX_ADC2_Init(channel); analog.instance = ADC2; break;
+
+	switch (GET_ANALOG_INSTANCE(pin)){
+		case ADC_1: analog.adc = MX_ADC1_Init(channel); break; // analog.instance = ADC1; break;
+		case ADC_2: analog.adc = MX_ADC2_Init(channel); break; // analog.instance = ADC2; break;
 		default: break;
 	}
 
@@ -98,29 +95,24 @@ analog_t analogInit(analogPin_t pin){
 
 
 /* analogDMAInit: Initialize ADC (NON-BLOCKING) */
-void analogDMAInit(analog_t *analog, analogPin_t pin, analogDMACallback_t callback){
-	// analog_t analog;
-
+void analogDMAInit(analog_t *analog, analogPin_t pin, analogCallback_t callback){
 	analog->pin = pin;
 	analog->value = 0;
 
 	int aPin = GET_ANALOG_PIN(pin);
 	int channel = aPin > 8 ? aPin - 8: aPin;
 
+	// analogBuffer[channel] = callback;
 
 	MX_DMA_Init();
 
 	switch (GET_ANALOG_INSTANCE(pin)) {
-		case ADC_1: analog->adc = MX_ADC1_Init(channel); analog->instance = ADC1; break;
-		case ADC_2: analog->adc = MX_ADC2_Init(channel); analog->instance = ADC2; break;
+		case ADC_1: analog->adc = MX_ADC1_Init(channel); break; // analog->instance = ADC1; break;
+		case ADC_2: analog->adc = MX_ADC2_Init(channel); break; // analog->instance = ADC2; break;
 		default: break;
 	}
 
-
 	HAL_ADC_Start_DMA(&analog->adc, &analog->value, 1);
-
-	analog->callback = callback;
-	analogBuffer[channel] = analog;
 }
 
 
@@ -133,15 +125,28 @@ uint32_t analogRead(analog_t *analog){
 
 /** CALLBACK **/
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-	for(int i = 0; i < MAX_ANALOG_CHANNELS; i++){
-		if(analogBuffer[i] != NULL && analogBuffer[i]->callback != NULL){
-			if(hadc->Instance == analogBuffer[i]->instance){
-				// (*analogBuffer[i]->callback)(analogBuffer[i]->value);
-				// analogBuffer[9]->callback
-				// printf("%p, %p (%d)\n", analogBuffer[9]->callback, &function, analogBuffer[9]->callback == &function);
-			}
-		}
-	}
+
+	// uint32_t active_channel = hadc->Instance->SQR3 & ADC_SQR3_SQ1;
+	// analogBuffer[GET_ANALOG_INSTANCE(pin)] = callback;
+
+	// analogInstance_t instance;
+	// if(hadc->Instance == ADC1){
+	// 	instance = ADC_1;
+	// // } else if (hadc->Instance == ADC2){
+	// } else {
+	// 	instance = ADC_2;
+	// }
+
+	// for(int i = 0; i < MAX_ANALOG_CHANNELS; i++){
+	// 	if(analogBuffer[i] != NULL && analogBuffer[i]->callback != NULL){
+	// 		if(hadc->Instance == analogBuffer[i]->instance){
+	// 			analogBuffer[i]->callback(analogBuffer[i]->value);
+	// 			// (*analogBuffer[i]->callback)(analogBuffer[i]->value);
+	// 			// analogBuffer[9]->callback
+	// 			// printf("%p, %p (%d)\n", analogBuffer[9]->callback, &function, analogBuffer[9]->callback == &function);
+	// 		}
+	// 	}
+	// }
 }
 
 

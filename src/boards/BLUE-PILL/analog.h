@@ -43,20 +43,24 @@ typedef enum {
 } analogPin_t;
 
 
-typedef void (*analogDMACallback_t)(int);
+// typedef void (*analogDMACallback_t)(int);
+
+typedef void (*analogCallback_t)(int);
 
 typedef struct {
 	analogPin_t pin;
 	ADC_HandleTypeDef adc;
 	uint32_t value;
-	analogDMACallback_t callback;
-	ADC_TypeDef *instance;
+	// analogDMACallback_t callback;
+	// ADC_TypeDef *instance;
 } analog_t;
 
 
-
 analog_t analogInit(analogPin_t pin);
-void analogDMAInit(analog_t *analog, analogPin_t pin, analogDMACallback_t callback);
+
+void analogDMAInit(analog_t *analog, analogPin_t pin, analogCallback_t callback);
+// analog_t analogDMAInit(analogPin_t pin, analogDMACallback_t callback);
+
 uint32_t analogRead(analog_t *analog);
 
 
