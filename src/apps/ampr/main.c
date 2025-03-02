@@ -8,18 +8,20 @@
 uint8_t displayBuffer[(128 * 64) / 8] = { 0 };
 
 
-#define VOLT_GAIN  0.965
-#define VOLT_OFFSET (+2.999)
+// #define VOLT_GAIN  0.9535
+#define VOLT_GAIN  0.962
+#define VOLT_OFFSET (+1.92)
 
-#define AMP_GAIN  0.91
-#define AMP_OFFSET (+0.048)
+#define AMP_GAIN  0.81
+#define AMP_OFFSET (+0.57)
 
 
-#define WINDOW_SIZE 20  // Number of samples for moving average
+#define VOLT_WINDOW_SIZE 20
+#define AMP_WINDOW_SIZE 50
 
 
 float voltage_moving_average(uint16_t new_value) {
-	static uint16_t window[WINDOW_SIZE] = {0};  // Circular buffer for ADC values
+	static uint16_t window[VOLT_WINDOW_SIZE] = {0};  // Circular buffer for ADC values
 	static int index = 0;                       // Current index in the buffer
 	static int count = 0;                       // Number of values added
 	static uint32_t sum = 0;                    // Sum of window values
@@ -27,14 +29,14 @@ float voltage_moving_average(uint16_t new_value) {
 	// Store the new ADC value
 	window[index] = new_value;
 	sum += new_value;
-	index = (index + 1) % WINDOW_SIZE;          // Update index (circularly)
-	if (count < WINDOW_SIZE) { count++; }       // Increase count until the buffer is full
+	index = (index + 1) % VOLT_WINDOW_SIZE;          // Update index (circularly)
+	if (count < VOLT_WINDOW_SIZE) { count++; }       // Increase count until the buffer is full
 	return (float)sum / count;                  // Return the moving average
 }
 
 
 float current_moving_average(uint16_t new_value) {
-	static uint16_t window[WINDOW_SIZE] = {0};  // Circular buffer for ADC values
+	static uint16_t window[AMP_WINDOW_SIZE] = {0};  // Circular buffer for ADC values
 	static int index = 0;                       // Current index in the buffer
 	static int count = 0;                       // Number of values added
 	static uint32_t sum = 0;                    // Sum of window values
@@ -42,8 +44,8 @@ float current_moving_average(uint16_t new_value) {
 	// Store the new ADC value
 	window[index] = new_value;
 	sum += new_value;
-	index = (index + 1) % WINDOW_SIZE;          // Update index (circularly)
-	if (count < WINDOW_SIZE) { count++; }       // Increase count until the buffer is full
+	index = (index + 1) % AMP_WINDOW_SIZE;          // Update index (circularly)
+	if (count < AMP_WINDOW_SIZE) { count++; }       // Increase count until the buffer is full
 	return (float)sum / count;                  // Return the moving average
 }
 
@@ -56,9 +58,27 @@ void floatStr(char *buffer, float value, char end){
 	sprintf(buffer, "%d.%02d%c", int_part, frac_part, end);
 }
 
+gpio_t relay;
+
 static analog_t ampAnlg;
 static float current;
 
+static int initDelaySec = 0;
+
+timer_t initDelayTim;
+
+static int relayState = 0;
+
+void initDelay(){
+	if(initDelaySec == 5){
+		timerStop(&initDelayTim);
+		gpinSet(&relay, PIN_ON);
+		relayState = 1;
+		initDelaySec++;
+	} else {
+		initDelaySec++;
+	}
+}
 
 void calcCurrent(){
 	int val = analogRead(&ampAnlg);
@@ -71,15 +91,20 @@ void calcCurrent(){
 
 void clbk(int _){}
 
-gpio_t relay;
 gpio_t btnA;
 gpio_t btnB;
 
 
-// Button A callback
-void btnACallback(void *ctx){ gpinToggle(&relay); }
-// Button B callback
-void btnBCallback(void *ctx){ gpinToggle(&relay); }
+// Button A callback (self calibration)
+void btnACallback(void *ctx){
+}
+
+// Button B callback (relay toggle)
+void btnBCallback(void *ctx){
+	relayState = relayState == 0;
+	gpinToggle(&relay);
+}
+
 
 int main(void){
 	boardInit();
@@ -93,7 +118,7 @@ int main(void){
 	ssd1306_t display = ssd1306Init(&i2c, SSD1306_I2C_DEV_ADDR, 128, 64, displayBuffer);
 
 	// Relay pin
-	relay = gpinInit(A_0, GPIO_OUTPUT_MODE, GPIN_NO_PULL);
+	relay = gpinInit(A_0, GPIO_OUTPUT_MODE, GPIN_PULL_DOWN);
 
 	// Button A (Internal PULL-UP, Falling edge)
 	btnA = gpinInit(A_2, GPIO_INPUT_MODE, GPIN_PULL_UP);
@@ -103,39 +128,45 @@ int main(void){
 	btnB = gpinInit(A_1, GPIO_INPUT_MODE, GPIN_PULL_UP);
 	gpinSetInterrupt(&btnB, IRQ_FALLING, IRQ_VERY_HIGH_PRIORITY, &btnBCallback, NULL);
 
-
-
 	analog_t volAnlg;
 	analogDMAInit(&volAnlg, ADC1_A5, clbk);
-
 	ampAnlg = analogInit(ADC2_B1);
-	
-	timerInit(TIMER_2, MS(200), calcCurrent, 1);
+	timerInit(TIMER_2, MS(400), calcCurrent, 1);
+	initDelayTim = timerInit(TIMER_3, S(1), initDelay, 1);
 
 	while(1){
-
 		char ampBuff[10] = { 0 };
 		floatStr(ampBuff, current, 'A');
-
-		gpinToggle(&relay);
-
+		// sprintf(ampBuff, "%d", analogRead(&ampAnlg));
 
 		float val = volAnlg.value;
 		val *= VOLT_GAIN;
 		val += VOLT_OFFSET;
 		float average = voltage_moving_average(val);
 		char voltBuff[10] = { 0 };
-		floatStr(voltBuff, average / 380.1886394, 'v');
 
+		floatStr(voltBuff, average * 0.00540935672515, 'v');
 
+		char *relayBuff = relayState ? " ON" : "OFF";
 		ssd1306ClearAll(&display);
-		ssd1306SetCursor(&display, 0, 0);
+
+		ssd1306SetCursor(&display, 20, 5);
+		ssd1306DrawString(&display, voltBuff, FONT_16X26, ssd1306White);
+
+		ssd1306SetCursor(&display, 20, 38);
 		ssd1306DrawString(&display, ampBuff, FONT_16X26, ssd1306White);
 
-		ssd1306SetCursor(&display, 0, 30);
-		ssd1306DrawString(&display, voltBuff, FONT_16X26, ssd1306White);
+		if(initDelaySec != 6){
+			char initDelayBuff[10];
+			sprintf(initDelayBuff, "%d", initDelaySec);
+			ssd1306SetCursor(&display, 115, 0);
+			ssd1306DrawString(&display, initDelayBuff, FONT_6X8, ssd1306White);
+		}
+
+		ssd1306SetCursor(&display, 110, 54);
+		ssd1306DrawString(&display, relayBuff, FONT_6X8, ssd1306White);
+
 		ssd1306Flush(&display);
-		// gpinToggle(&relay);
 	}
 
 	return 0;
