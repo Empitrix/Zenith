@@ -114,6 +114,19 @@ void delayMs(uint32_t milliseconds){
 	HAL_Delay(milliseconds);
 }
 
+void delayUs(uint32_t us) {
+	// Enable DWT and CYCCNT
+	if (!(DWT->CTRL & DWT_CTRL_CYCCNTENA_Msk)) {
+		CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // Enable trace
+		DWT->CYCCNT = 0;  // Reset counter
+		DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;  // Enable counter
+	}
+
+	uint32_t start = DWT->CYCCNT;
+	uint32_t ticks = us * (SystemCoreClock / 1000000);  // Convert µs to clock cycles
+	while ((DWT->CYCCNT - start) < ticks);
+}
+
 // void delayUs(uint32_t us){
 // 	__HAL_TIM_SET_COUNTER(&htim1,0);
 // 	while (__HAL_TIM_GET_COUNTER(&htim1) < us);

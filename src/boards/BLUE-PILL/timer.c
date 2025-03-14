@@ -594,7 +594,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim){
 	previusTicks = ccr;
 }
 
-void delayUs(uint16_t us){
-	__HAL_TIM_SET_COUNTER(&htim1, 0);
-	while(__HAL_TIM_GET_COUNTER(&htim1) < us){}
-}
+// void delayUs(uint16_t us){
+// 	__HAL_TIM_SET_COUNTER(&htim1, 0);
+// 	while(__HAL_TIM_GET_COUNTER(&htim1) < us){}
+// }

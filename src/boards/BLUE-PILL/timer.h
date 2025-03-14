@@ -134,7 +134,7 @@ typedef enum {
 
 void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, int tickTime, timer_callback_t callback);
 
-void delayUs(uint16_t us);
+// void delayUs(uint16_t us);
 
 #endif
 

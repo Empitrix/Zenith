@@ -8,5 +8,6 @@
 void boardInit(void);
 int boardGetTick(void);
 void delayMs(uint32_t milliseconds);
+void delayUs(uint32_t us);
 
 #endif
