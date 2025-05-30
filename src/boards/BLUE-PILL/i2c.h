@@ -16,7 +16,6 @@ typedef enum {
 typedef enum {
 	//           CLK           SDA
 	I2C1_B6_B7 = (I2C_1 << 16) | (B_6  << 8) | B_7,
-	// I2C1_B8_B9 = (I2C_1 << 16) | (B_8  << 8) | B_9,
 	I2C2_B6_B7 = (I2C_1 << 16) | (B_10 << 8) | B_11,
 } i2cPins_t;
 

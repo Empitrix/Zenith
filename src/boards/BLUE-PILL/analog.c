@@ -9,7 +9,6 @@ ADC_HandleTypeDef hadc2;
 // DMA
 DMA_HandleTypeDef hdma_adc1;
 
-// analogCallback_t analogBuffer[MAX_ANALOG_CHANNELS + 1] = { NULL };
 
 ADC_HandleTypeDef MX_ADC1_Init(int channel){
 	ADC_ChannelConfTypeDef sConfig = {0};
@@ -57,17 +56,15 @@ ADC_HandleTypeDef MX_ADC2_Init(int channel){
 	return hadc2;
 }
 
-static void MX_DMA_Init(void)
-{
+static void MX_DMA_Init(void){
 
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
+	/* DMA controller clock enable */
+	__HAL_RCC_DMA1_CLK_ENABLE();
 
-  /* DMA interrupt init */
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-
+	/* DMA interrupt init */
+	/* DMA1_Channel1_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
 
 
@@ -102,8 +99,6 @@ void analogDMAInit(analog_t *analog, analogPin_t pin, analogCallback_t callback)
 	int aPin = GET_ANALOG_PIN(pin);
 	int channel = aPin > 8 ? aPin - 8: aPin;
 
-	// analogBuffer[channel] = callback;
-
 	MX_DMA_Init();
 
 	switch (GET_ANALOG_INSTANCE(pin)) {
@@ -125,28 +120,6 @@ uint32_t analogRead(analog_t *analog){
 
 /** CALLBACK **/
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-
-	// uint32_t active_channel = hadc->Instance->SQR3 & ADC_SQR3_SQ1;
-	// analogBuffer[GET_ANALOG_INSTANCE(pin)] = callback;
-
-	// analogInstance_t instance;
-	// if(hadc->Instance == ADC1){
-	// 	instance = ADC_1;
-	// // } else if (hadc->Instance == ADC2){
-	// } else {
-	// 	instance = ADC_2;
-	// }
-
-	// for(int i = 0; i < MAX_ANALOG_CHANNELS; i++){
-	// 	if(analogBuffer[i] != NULL && analogBuffer[i]->callback != NULL){
-	// 		if(hadc->Instance == analogBuffer[i]->instance){
-	// 			analogBuffer[i]->callback(analogBuffer[i]->value);
-	// 			// (*analogBuffer[i]->callback)(analogBuffer[i]->value);
-	// 			// analogBuffer[9]->callback
-	// 			// printf("%p, %p (%d)\n", analogBuffer[9]->callback, &function, analogBuffer[9]->callback == &function);
-	// 		}
-	// 	}
-	// }
 }
 
 

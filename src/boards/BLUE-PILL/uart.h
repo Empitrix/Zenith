@@ -26,7 +26,6 @@ uart_t uartInit(serial_t type, int baudRate);
 
 static volatile uart_t uart_write, uart_read;
 
-// void uartInit(serial_t type, int baudrate);
 void uartSetSTDOUT(uart_t *uart);
 void uartSetSTDIN(uart_t *uart);
 

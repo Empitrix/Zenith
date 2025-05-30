@@ -5,6 +5,7 @@
 #define GET_SCL(pin)          ((pin >> 8)  & 0xFF)  // Extract SCL pin
 #define GET_SDA(pin)          (pin & 0xFF)          // Extract SDA pin
 
+
 I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c2;
 

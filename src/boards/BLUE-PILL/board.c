@@ -43,12 +43,6 @@ void SystemClock_Config(void){
 	{
 		Error_Handler();
 	}
-
-	// PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-	// PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-	// if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK){
-	// 	Error_Handler();
-	// }
 }
 
 
@@ -64,29 +58,6 @@ void MX_GPIO_Init(void){
 
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOE_CLK_ENABLE();
-
-
-	//// Enable GPIO intera
-	//HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI1_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI2_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI4_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-	//HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-	//HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 }
 
 
@@ -126,11 +97,6 @@ void delayUs(uint32_t us) {
 	uint32_t ticks = us * (SystemCoreClock / 1000000);  // Convert µs to clock cycles
 	while ((DWT->CYCCNT - start) < ticks);
 }
-
-// void delayUs(uint32_t us){
-// 	__HAL_TIM_SET_COUNTER(&htim1,0);
-// 	while (__HAL_TIM_GET_COUNTER(&htim1) < us);
-// }
 
 int boardGetTick(void){
 	return (uint32_t)HAL_GetTick();

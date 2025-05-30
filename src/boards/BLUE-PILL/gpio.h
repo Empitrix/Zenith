@@ -88,9 +88,7 @@ typedef enum {
 
 
 typedef void (*callbackFunction_t)(void*);
-// typedef void (*irqFunction_t)(void *);
 
-// void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler);
 void gpinSetInterrupt(gpio_t *pin, irqModes_t irqMode, irqPriorities_t irqPriority, callbackFunction_t irqHandler, void *context);
 void gpinRemoveInterrupt(gpio_t *pin);
 

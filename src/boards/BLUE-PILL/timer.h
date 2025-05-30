@@ -112,10 +112,7 @@ typedef enum {
 	B6_TIM4_CH1  =  ( B_6 << 16) | (TIMER_4 << 8) | CH_1,
 	B1_TIM3_CH4  =  ( B_1 << 16) | (TIMER_3 << 8) | CH_4,
 	B0_TIM3_CH3  =  ( B_0 << 16) | (TIMER_3 << 8) | CH_3,
-
 	B5_TIM3_CH2  =  ( A_7 << 16) | (TIMER_3 << 8) | CH_2,
-	// A7_TIM3_CH2  =  ( A_7 << 16) | (TIMER_3 << 8) | CH_2,
-
 	A6_TIM3_CH1  =  ( A_6 << 16) | (TIMER_3 << 8) | CH_1,
 	A3_TIM2_CH4  =  ( A_3 << 16) | (TIMER_2 << 8) | CH_4,
 	A2_TIM2_CH3  =  ( A_2 << 16) | (TIMER_2 << 8) | CH_3,
@@ -128,13 +125,7 @@ typedef enum {
 } tiemrCaptureConfig_t;
 
 
-// void timerCaptureInit(timer_t *timer, timerChannel_t channel, capturePolarity_t polarity, timer_callback_t callback);
-// void timerCaptureInit(tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
-// void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, timer_callback_t callback);
-
 void timerCaptureInit(timer_t *timer, tiemrCaptureConfig_t config, capturePolarity_t polarity, int tickTime, timer_callback_t callback);
-
-// void delayUs(uint16_t us);
 
 #endif
 
